@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">SugoActorArducopter</string>
+    <string name="button_start">始める</string>
+    <string name="button_start_connecting">接続中</string>
+    <string name="button_start_connected">接続済み</string>
+    <string name="key_hub">hub</string>
+    <string name="default_hub">http://localhost:8080/</string>
+    <string name="key_actor_id">actor-id</string>
+    <string name="default_actor_id">1</string>
+    <string name="item_settings">設定</string>
+</resources>
