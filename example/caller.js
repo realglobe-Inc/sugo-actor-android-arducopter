@@ -16,7 +16,44 @@ co(function * () {
 
   yield asleep(10000)
 
-  yield arduCopter.takeoff(100)
+  const takeoffAlt = 10;
+  const maxAlt = 100;
 
-  caller.disconnect()
+  arduCopter.on('arming', (isArmed) => {
+    if (isArmed) {
+      arduCopter.takeoff(takeoffAlt)
+    }
+  })
+
+  // 1: 離陸
+  // 2: 上昇
+  // 3: 着陸
+  let phase = 1
+  arduCopter.on('altitude', (altitude) => {
+    console.log(altitude)
+    switch (phase) {
+      case 1: {
+        if (altitude > takeoffAlt * 0.8) {
+          arduCopter.climbTo(maxAlt)
+          phase = 2
+        }
+        break
+      }
+      case 2: {
+        if (altitude > maxAlt * 0.8) {
+          arduCopter.land()
+          phase = 3
+        }
+        break
+      }
+      case 3: {
+        if (altitude < 10) {
+          caller.disconnect()
+        }
+        break
+      }
+    }
+  })
+
+  yield arduCopter.arm(true)
 }).catch((err) => console.error(err))

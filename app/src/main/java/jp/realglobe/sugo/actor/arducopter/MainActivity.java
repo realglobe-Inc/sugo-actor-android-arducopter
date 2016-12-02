@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        this.module = new ArduCopter(new Handler(), getApplicationContext());
+        this.module = new ArduCopter(getString(R.string.module_name), new Handler(), getApplicationContext());
 
         this.startButton = (Button) findViewById(R.id.button_start);
     }
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         this.module.close();
+        this.actor.disconnect();
     }
 
     @Override
@@ -78,19 +79,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final String actorKey = "arducopter:" + preferences.getString(getString(R.string.key_actor_id), getString(R.string.default_actor_id));
+        final String actorKey = getString(R.string.actor_key_prefix) + preferences.getString(getString(R.string.key_actor_id), getString(R.string.default_actor_id));
         final String actorName = MainActivity.class.getName();
-        final String actorDescription = "arduCopter actor in Android";
+        final String actorDescription = getString(R.string.actor_description);
         this.actor = new Actor(actorKey, actorName, actorDescription);
 
-        final String moduleName = "arduCopter";
+        final String moduleName = getString(R.string.module_name);
         final String moduleVersion;
         try {
             moduleVersion = getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
         }
-        final String moduleDescription = "arduCopter module in Android";
+        final String moduleDescription = getString(R.string.module_description);
         this.actor.addModule(moduleName, moduleVersion, moduleDescription, this.module);
 
         this.actor.setOnConnect(() -> this.startButton.post(this::changeToConnectedState));
