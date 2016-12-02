@@ -8,4 +8,8 @@
     <string name="key_actor_id">actor-id</string>
     <string name="default_actor_id">1</string>
     <string name="item_settings">設定</string>
+    <string name="module_name">arduCopter</string>
+    <string name="actor_key_prefix">arducopter:</string>
+    <string name="actor_description">arduCopter actor in Android</string>
+    <string name="module_description">arduCopter module in Android</string>
 </resources>
