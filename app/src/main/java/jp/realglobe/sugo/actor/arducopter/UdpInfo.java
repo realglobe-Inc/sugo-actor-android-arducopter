@@ -5,9 +5,10 @@ import java.net.URISyntaxException;
 
 /**
  * UDP の接続指定
+ * <p>
  * Created by fukuchidaisuke on 16/12/01.
  */
-class UdpInfo {
+final class UdpInfo {
 
     private static final String LOCAL_REMOTE_SEPARATOR = "<>";
 
