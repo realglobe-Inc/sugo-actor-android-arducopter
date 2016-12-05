@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="@string/item_settings" />
 
+    <item
+        android:id="@+id/item_disconnect"
+        android:orderInCategory="200"
+        android:title="@string/item_disconnect" />
+
 </menu>

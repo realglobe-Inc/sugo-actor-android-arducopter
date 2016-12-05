@@ -1,5 +1,8 @@
 package jp.realglobe.sugo.actor.arducopter;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -48,7 +51,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         this.module.close();
-        this.actor.disconnect();
+        disconnect();
+    }
+
+    private void disconnect() {
+        this.module.disconnect();
+        if (this.actor != null) {
+            this.actor.disconnect();
+            this.actor = null;
+            this.changeToUnconnectState();
+        }
     }
 
     @Override
@@ -63,7 +75,32 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.item_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }
+        if (item.getItemId() == R.id.item_disconnect) {
+            disconnectAfterDialog();
+        }
         return true;
+    }
+
+    private void disconnectAfterDialog() {
+        if (this.actor != null) {
+            (new DisconnectDialog()).show(getFragmentManager(), "dialog");
+        }
+    }
+
+    /**
+     * 切断ダイアログ
+     */
+    public static class DisconnectDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final MainActivity activity = (MainActivity) getActivity();
+            return (new AlertDialog.Builder(activity))
+                    .setTitle("切断しますか？")
+                    .setPositiveButton("切断する", (dialog, which) -> {
+                        activity.disconnect();
+                    })
+                    .create();
+        }
     }
 
     public void onStartButtonTapped(View view) {
@@ -110,5 +147,9 @@ public class MainActivity extends AppCompatActivity {
         this.startButton.setText(getString(R.string.button_start_connected));
     }
 
+    private void changeToUnconnectState() {
+        this.startButton.setEnabled(true);
+        this.startButton.setText(getString(R.string.button_start));
+    }
 
 }
