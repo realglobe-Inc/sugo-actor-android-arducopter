@@ -11,8 +11,7 @@ import com.o3dr.android.client.interfaces.TowerListener;
 import jp.realglobe.sugo.actor.Emitter;
 
 /**
- * ドローンコントローラー
- * <p>
+ * ドローンコントローラー。
  * Created by fukuchidaisuke on 16/12/06.
  */
 class MyTowerListener implements TowerListener {

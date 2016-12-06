@@ -24,7 +24,7 @@ import jp.realglobe.sugo.actor.Emitter;
 import jp.realglobe.sugo.actor.ModuleMethod;
 
 /**
- * arduCopter モジュール
+ * arduCopter モジュール。
  * Created by fukuchidaisuke on 16/11/28.
  */
 public class ArduCopter extends Emitter implements Cloneable {
@@ -115,8 +115,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ドローンにつなぐ
-     * <p>
+     * ドローンにつなぐ。
      * 引数は ("USB", "57600") や ("UDP", "192.168.1.3") など
      *
      * @param type    接続タイプ
@@ -286,8 +285,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ドローンに保存されているミッションを読み込む
-     * <p>
+     * ドローンに保存されているミッションを読み込む。
      * ミッションは EVENT_MISSION イベントで受け取る
      */
     @ModuleMethod

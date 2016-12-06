@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 座標周りの便利関数
- * <p>
+ * 座標周りの便利関数。
  * Created by fukuchidaisuke on 16/12/05.
  */
 final class Coordinates {

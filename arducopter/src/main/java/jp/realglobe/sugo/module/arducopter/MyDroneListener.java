@@ -19,8 +19,7 @@ import com.o3dr.services.android.lib.drone.property.Type;
 import jp.realglobe.sugo.actor.Emitter;
 
 /**
- * ドローンからのデータを受け取って中継する
- * <p>
+ * ドローンからのデータを受け取って中継する。
  * Created by fukuchidaisuke on 16/12/06.
  */
 class MyDroneListener implements DroneListener {
