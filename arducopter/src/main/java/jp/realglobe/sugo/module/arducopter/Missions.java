@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.module.arducopter;
 
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;

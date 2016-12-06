@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.module.arducopter;
 
 import java.net.URI;
 import java.net.URISyntaxException;
