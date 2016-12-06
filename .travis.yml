@@ -17,7 +17,10 @@ cache:
     - $HOME/.gradle/wrapper/
 before_install:
   - envsubst < .travis-gradle.properties.template > gradle.properties
-script: ./gradlew build test
+script:
+  - cat /home/travis/build.sh
+  - exit 1
+  - ./gradlew build test
 deploy:
   provider: script
   script: ./.travis-deploy.sh
