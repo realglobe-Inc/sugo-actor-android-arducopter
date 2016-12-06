@@ -6,18 +6,20 @@ const asleep = require('asleep')
 
 const HUB = process.env.HUB || 'http://localhost:8080'
 const ACTOR = process.env.ACTOR || 'arducopter:1'
+const DRONE_TYPE = process.env.DRONE_TYPE || 'udp'
+const DRONE_ADDR = process.env.DRONE_ADDR || 'localhost'
 
 co(function * () {
   const caller = sugoCaller(HUB + '/callers')
   const actor = yield caller.connect(ACTOR)
   const arduCopter = actor.get('arduCopter')
 
-  yield arduCopter.connect('udp', '192.168.1.33')
+  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
 
-  yield asleep(10000)
+  yield asleep(5000)
 
-  const takeoffAlt = 10;
-  const maxAlt = 100;
+  const takeoffAlt = 10
+  const maxAlt = 100
 
   arduCopter.on('arming', (isArmed) => {
     if (isArmed) {
