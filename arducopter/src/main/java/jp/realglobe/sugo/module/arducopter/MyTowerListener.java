@@ -14,7 +14,7 @@ import jp.realglobe.sugo.actor.Emitter;
  * ドローンコントローラー。
  * Created by fukuchidaisuke on 16/12/06.
  */
-class MyTowerListener implements TowerListener {
+final class MyTowerListener implements TowerListener {
 
     private static final String LOG_TAG = MyTowerListener.class.getName();
 

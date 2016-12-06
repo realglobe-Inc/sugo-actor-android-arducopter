@@ -22,7 +22,7 @@ import jp.realglobe.sugo.actor.Emitter;
  * ドローンからのデータを受け取って中継する。
  * Created by fukuchidaisuke on 16/12/06.
  */
-class MyDroneListener implements DroneListener {
+final class MyDroneListener implements DroneListener {
 
     private static final String LOG_TAG = MyDroneListener.class.getName();
 
