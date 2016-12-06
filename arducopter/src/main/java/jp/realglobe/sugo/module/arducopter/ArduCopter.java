@@ -18,6 +18,7 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jp.realglobe.sugo.actor.Emitter;
@@ -133,7 +134,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     private static ConnectionParameter parseConnectionParameter(String type, String address) {
-        switch (type.toUpperCase()) {
+        switch (type.toUpperCase(Locale.US)) {
             case CONNECT_TYPE_UDP: {
                 if (address == null || address.isEmpty()) {
                     return ConnectionParameter.newUdpConnection(null);
