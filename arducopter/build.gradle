@@ -46,3 +46,24 @@ repositories {
         }
     }
 }
+
+android.libraryVariants.all { variant ->
+    task("javadoc", type: Javadoc, overwrite: true) {
+        title = "ArduCopter Module"
+        source = variant.javaCompile.source
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+
+        options {
+            links('http://docs.oracle.com/javase/jp/8/docs/api/');
+            linksOffline('https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference");
+            setMemberLevel(JavadocMemberLevel.PUBLIC)
+            docEncoding = 'UTF-8'
+            encoding = 'UTF-8'
+            charSet = 'UTF-8'
+        }
+
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+}
