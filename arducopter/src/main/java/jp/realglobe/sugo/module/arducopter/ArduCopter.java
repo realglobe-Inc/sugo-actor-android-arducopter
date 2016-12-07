@@ -143,7 +143,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     private final ControlApi control;
     private final VehicleApi vehicle;
-    private final MissionApi mision;
+    private final MissionApi mission;
 
 
     public ArduCopter(String name, Handler handler, Context context) {
@@ -154,7 +154,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
         this.control = ControlApi.getApi(this.drone);
         this.vehicle = VehicleApi.getApi(this.drone);
-        this.mision = MissionApi.getApi(this.drone);
+        this.mission = MissionApi.getApi(this.drone);
 
 
         this.tower.connect(new MyTowerListener(this.tower, this.drone, handler, this));
@@ -343,7 +343,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void jumpToCommand(int index) {
-        this.mision.gotoWaypoint(index, null);
+        this.mission.gotoWaypoint(index, null);
     }
 
     /**
@@ -352,7 +352,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void loadMission() {
-        this.mision.loadWaypoints();
+        this.mission.loadWaypoints();
     }
 
     /**
@@ -368,12 +368,12 @@ public class ArduCopter extends Emitter implements Cloneable {
         for (MissionItem item : items) {
             currentMission.addMissionItem(item);
         }
-        this.mision.setMission(currentMission, true);
+        this.mission.setMission(currentMission, true);
     }
 
     @ModuleMethod
     public void startMission(boolean forceModeChange, boolean forceArm) {
-        this.mision.startMission(forceModeChange, forceArm, null);
+        this.mission.startMission(forceModeChange, forceArm, null);
     }
 
 }
