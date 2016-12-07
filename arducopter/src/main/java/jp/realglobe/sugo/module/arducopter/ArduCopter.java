@@ -3,6 +3,7 @@ package jp.realglobe.sugo.module.arducopter;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
@@ -11,10 +12,12 @@ import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
 import java.util.List;
@@ -33,9 +36,17 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     private static final String LOG_TAG = ArduCopter.class.getName();
 
+    private static final SparseArray<String> MODE_PREFIXES;
+
+    static {
+        MODE_PREFIXES = new SparseArray<>();
+        MODE_PREFIXES.put(Type.TYPE_COPTER, "COPTER_");
+        MODE_PREFIXES.put(Type.TYPE_PLANE, "PLANE_");
+        MODE_PREFIXES.put(Type.TYPE_ROVER, "ROVER_");
+    }
+
     public static final String CONNECT_TYPE_UDP = "UDP";
     public static final String CONNECT_TYPE_USB = "USB";
-
 
     /**
      * 接続した
@@ -260,7 +271,12 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void setVehicleMode(String newMode) {
-        this.vehicle.setVehicleMode(VehicleMode.valueOf(newMode));
+        final Type type = this.drone.getAttribute(AttributeType.TYPE);
+        final String prefix = MODE_PREFIXES.get(type.getDroneType());
+        if (prefix == null) {
+            throw new IllegalStateException("unsupported type");
+        }
+        this.vehicle.setVehicleMode(VehicleMode.valueOf(prefix + newMode.toUpperCase(Locale.US)));
     }
 
     /**
