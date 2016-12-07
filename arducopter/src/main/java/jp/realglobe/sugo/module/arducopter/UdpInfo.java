@@ -1,11 +1,10 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.module.arducopter;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * UDP の接続指定
- * <p>
+ * UDP の接続指定。
  * Created by fukuchidaisuke on 16/12/01.
  */
 final class UdpInfo {

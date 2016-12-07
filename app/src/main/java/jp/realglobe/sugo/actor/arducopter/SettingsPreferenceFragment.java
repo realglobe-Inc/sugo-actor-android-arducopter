@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 設定画面
+ * 設定画面。
  * Created by fukuchidaisuke on 16/11/30.
  */
 

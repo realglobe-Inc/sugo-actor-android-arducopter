@@ -1,0 +1,72 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    testCompile 'junit:junit:4.12'
+    compile 'com.o3dr.android:dronekit-android:3.0.2'
+    compile(group: 'jp.realglobe', name: 'sugo-actor', version: '3.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+}
+
+repositories {
+    jcenter()
+    maven {
+        url "${artifactory_contextUrl}/libs-release"
+        credentials {
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+}
+
+android.libraryVariants.all { variant ->
+    task("javadoc", type: Javadoc, overwrite: true) {
+        title = "ArduCopter Module"
+        source = variant.javaCompile.source
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+
+        options {
+            links('http://docs.oracle.com/javase/jp/8/docs/api/');
+            linksOffline('https://developer.android.com/reference/', "${android.sdkDirectory}/docs/reference");
+            setMemberLevel(JavadocMemberLevel.PUBLIC)
+            docEncoding = 'UTF-8'
+            encoding = 'UTF-8'
+            charSet = 'UTF-8'
+        }
+
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+}

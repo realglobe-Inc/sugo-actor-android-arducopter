@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.module.arducopter;
 
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ミッション周りの便利関数
- * <p>
+ * ミッション周りの便利関数。
  * Created by fukuchidaisuke on 16/12/05.
  */
 final class Missions {

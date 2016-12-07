@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 /**
- * 設定画面を表示する
+ * 設定画面を表示する。
  * Created by fukuchidaisuke on 16/11/30.
  */
 

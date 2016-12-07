@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.module.arducopter;
 
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 座標周りの便利関数
- * <p>
+ * 座標周りの便利関数。
  * Created by fukuchidaisuke on 16/12/05.
  */
 final class Coordinates {
@@ -36,6 +35,12 @@ final class Coordinates {
         return Arrays.asList(latLongAlt.getLatitude(), latLongAlt.getLongitude(), latLongAlt.getAltitude());
     }
 
+    /**
+     * JSON 互換形式から変換する
+     *
+     * @param latLongAlt 座標を表す JSON 互換のデータ
+     * @return 座標
+     */
     static LatLongAlt decodeLatLongAlt(Object latLongAlt) {
         if (latLongAlt instanceof Object[]) {
             return decodeLatLongAlt((Object[]) latLongAlt);
