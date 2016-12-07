@@ -7,7 +7,8 @@ android:
     - platform-tools
     - android-25
     - build-tools-25.0.1
-    - extra
+    - extra-android-m2repository
+    - extra-android-support
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
