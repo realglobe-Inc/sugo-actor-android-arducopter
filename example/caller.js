@@ -57,5 +57,7 @@ co(function * () {
     }
   })
 
+  yield arduCopter.setVehicleMode('GUIDED')
+  yield asleep(1000)
   yield arduCopter.arm(true)
 }).catch((err) => console.error(err))
