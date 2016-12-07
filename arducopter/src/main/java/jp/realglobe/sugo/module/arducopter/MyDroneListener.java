@@ -16,6 +16,9 @@ import com.o3dr.services.android.lib.drone.property.Speed;
 import com.o3dr.services.android.lib.drone.property.State;
 import com.o3dr.services.android.lib.drone.property.Type;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jp.realglobe.sugo.actor.Emitter;
 
 /**
@@ -25,6 +28,21 @@ import jp.realglobe.sugo.actor.Emitter;
 final class MyDroneListener implements DroneListener {
 
     private static final String LOG_TAG = MyDroneListener.class.getName();
+
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_FIRMWARE = "firmware";
+    private static final String KEY_VERSION = "version";
+    private static final String KEY_MODE = "mode";
+    private static final String KEY_ARMING = "arming";
+    private static final String KEY_GROUND = "ground";
+    private static final String KEY_VERTICAL = "vertical";
+    private static final String KEY_AIR = "air";
+    private static final String KEY_REMAIN = "remain";
+    private static final String KEY_VOLTAGE = "voltage";
+    private static final String KEY_CURRENT = "current";
+    private static final String KEY_COORDINATE = "coordinate";
+    private static final String KEY_ALTITUDE = "altitude";
+    private static final String KEY_COMMANDS = "commands";
 
     private final Drone drone;
     private final Emitter emitter;
@@ -36,79 +54,104 @@ final class MyDroneListener implements DroneListener {
 
     @Override
     public void onDroneEvent(String event, Bundle extras) {
+        // ArduCopter のコメントと同期すること。
         switch (event) {
             case AttributeEvent.STATE_CONNECTED: {
-                Log.d(LOG_TAG, "Drone connected state: " + this.drone.isConnected());
-                emitter.emit(ArduCopter.EVENT_CONNECTED, this.drone.isConnected());
+                Log.d(LOG_TAG, "Drone connected");
+                emitter.emit(ArduCopter.EVENT_CONNECTED, null);
                 break;
             }
 
             case AttributeEvent.STATE_DISCONNECTED: {
-                Log.d(LOG_TAG, "Drone disconnected state: " + (!this.drone.isConnected()));
-                emitter.emit(ArduCopter.EVENT_DISCONNECTED, !this.drone.isConnected());
-                break;
-            }
-
-            case AttributeEvent.STATE_VEHICLE_MODE: {
-                final State state = this.drone.getAttribute(AttributeType.STATE);
-                Log.d(LOG_TAG, "Drone mode state: " + state.getVehicleMode().getLabel());
-                emitter.emit(ArduCopter.EVENT_VEHICLE_MODE, state.getVehicleMode().getLabel());
-                break;
-            }
-
-            case AttributeEvent.STATE_ARMING: {
-                final State state = this.drone.getAttribute(AttributeType.STATE);
-                Log.d(LOG_TAG, "Drone arming state: " + state.isArmed());
-                emitter.emit(ArduCopter.EVENT_ARMING, state.isArmed());
+                Log.d(LOG_TAG, "Drone disconnected");
+                emitter.emit(ArduCopter.EVENT_DISCONNECTED, null);
                 break;
             }
 
             case AttributeEvent.TYPE_UPDATED: {
                 final Type type = this.drone.getAttribute(AttributeType.TYPE);
-                Log.d(LOG_TAG, "Drone type updated: " + type.getDroneType());
-                emitter.emit(ArduCopter.EVENT_DRONE_TYPE, type.getDroneType());
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_TYPE, type.getDroneType());
+                data.put(KEY_FIRMWARE, type.getFirmware().getLabel());
+                data.put(KEY_VERSION, type.getFirmwareVersion());
+                Log.d(LOG_TAG, "Drone type updated: " + data);
+                emitter.emit(ArduCopter.EVENT_TYPE, data);
+                break;
+            }
+
+            case AttributeEvent.STATE_VEHICLE_MODE: {
+                final State state = this.drone.getAttribute(AttributeType.STATE);
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_MODE, state.getVehicleMode().getLabel());
+                Log.d(LOG_TAG, "Drone mode updated: " + data);
+                emitter.emit(ArduCopter.EVENT_MODE, data);
+                break;
+            }
+
+            case AttributeEvent.STATE_ARMING: {
+                final State state = this.drone.getAttribute(AttributeType.STATE);
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_ARMING, state.isArmed());
+                Log.d(LOG_TAG, "Drone arming updated: " + data);
+                emitter.emit(ArduCopter.EVENT_ARMING, data);
                 break;
             }
 
             case AttributeEvent.SPEED_UPDATED: {
                 final Speed speed = this.drone.getAttribute(AttributeType.SPEED);
-                Log.d(LOG_TAG, "Drone speed updated: " + speed.getGroundSpeed());
-                emitter.emit(ArduCopter.EVENT_SPEED, speed.getGroundSpeed());
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_GROUND, speed.getGroundSpeed());
+                data.put(KEY_VERTICAL, speed.getVerticalSpeed());
+                data.put(KEY_AIR, speed.getAirSpeed());
+                Log.d(LOG_TAG, "Drone speed updated: " + data);
+                emitter.emit(ArduCopter.EVENT_SPEED, data);
                 break;
             }
 
             case AttributeEvent.BATTERY_UPDATED: {
                 final Battery battery = this.drone.getAttribute(AttributeType.BATTERY);
-                Log.d(LOG_TAG, "Drone battery updated: " + battery.getBatteryRemain());
-                emitter.emit(ArduCopter.EVENT_BATTERY, battery.getBatteryRemain());
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_REMAIN, battery.getBatteryRemain());
+                data.put(KEY_VOLTAGE, battery.getBatteryVoltage());
+                data.put(KEY_CURRENT, battery.getBatteryCurrent());
+                Log.d(LOG_TAG, "Drone battery updated: " + data);
+                emitter.emit(ArduCopter.EVENT_BATTERY, data);
                 break;
             }
 
             case AttributeEvent.HOME_UPDATED: {
                 final Home home = this.drone.getAttribute(AttributeType.HOME);
-                Log.d(LOG_TAG, "Drone home updated: " + home.getCoordinate());
-                emitter.emit(ArduCopter.EVENT_HOME, Coordinates.encode(home.getCoordinate()));
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_COORDINATE, Coordinates.encode(home.getCoordinate()));
+                Log.d(LOG_TAG, "Drone home updated: " + data);
+                emitter.emit(ArduCopter.EVENT_HOME, data);
                 break;
             }
 
             case AttributeEvent.ALTITUDE_UPDATED: {
                 final Altitude altitude = this.drone.getAttribute(AttributeType.ALTITUDE);
-                Log.d(LOG_TAG, "Drone altitude updated: " + altitude.getAltitude());
-                emitter.emit(ArduCopter.EVENT_ALTITUDE, altitude.getAltitude());
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_ALTITUDE, altitude.getAltitude());
+                Log.d(LOG_TAG, "Drone altitude updated: " + data);
+                emitter.emit(ArduCopter.EVENT_ALTITUDE, data);
                 break;
             }
 
             case AttributeEvent.GPS_POSITION: {
                 final Gps gps = this.drone.getAttribute(AttributeType.GPS);
-                Log.d(LOG_TAG, "Drone GPS position: " + gps.getPosition());
-                emitter.emit(ArduCopter.EVENT_GPS_POSITION, Coordinates.encode(gps.getPosition()));
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_COORDINATE, Coordinates.encode(gps.getPosition()));
+                Log.d(LOG_TAG, "Drone GPS position updated: " + data);
+                emitter.emit(ArduCopter.EVENT_GPS_POSITION, data);
                 break;
             }
 
             case AttributeEvent.MISSION_RECEIVED: {
                 final Mission mission = new Mission();
-                Log.d(LOG_TAG, "Drone mission received: " + mission);
-                emitter.emit(ArduCopter.EVENT_MISSION, Missions.encode(mission));
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_COMMANDS, Missions.encode(mission));
+                Log.d(LOG_TAG, "Drone mission received: " + data);
+                emitter.emit(ArduCopter.EVENT_MISSION, data);
                 break;
             }
 

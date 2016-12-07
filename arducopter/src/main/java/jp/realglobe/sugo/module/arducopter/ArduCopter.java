@@ -3,6 +3,7 @@ package jp.realglobe.sugo.module.arducopter;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
@@ -11,10 +12,12 @@ import com.o3dr.android.client.apis.MissionApi;
 import com.o3dr.android.client.apis.VehicleApi;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
+import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
+import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
 import java.util.List;
@@ -33,52 +36,105 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     private static final String LOG_TAG = ArduCopter.class.getName();
 
+    private static final SparseArray<String> MODE_PREFIXES;
+
+    static {
+        MODE_PREFIXES = new SparseArray<>();
+        MODE_PREFIXES.put(Type.TYPE_COPTER, "COPTER_");
+        MODE_PREFIXES.put(Type.TYPE_PLANE, "PLANE_");
+        MODE_PREFIXES.put(Type.TYPE_ROVER, "ROVER_");
+    }
+
     public static final String CONNECT_TYPE_UDP = "UDP";
     public static final String CONNECT_TYPE_USB = "USB";
 
-
     /**
-     * 接続した
+     * {@value}: 接続した。
+     * 添付データ無し
      */
     public static final String EVENT_CONNECTED = "connected";
+
     /**
-     * 接続が切れた
+     * {@value}: 接続が切れた。
+     * 添付データ無し
      */
     public static final String EVENT_DISCONNECTED = "disconnected";
+
     /**
-     * 動作モードが変わった
+     * {@value}: 機種通知。
+     * <table>
+     * <tr><th>type</th><th>機種名</th></tr>
+     * <tr><th>firmware</th><th>ファームウェア名</th></tr>
+     * <tr><th>version</th><th>ファームウェアバージョン</th></tr>
+     * </table>
      */
-    public static final String EVENT_VEHICLE_MODE = "vehicleMode";
+    public static final String EVENT_TYPE = "type";
+
     /**
-     * 機種タイプが変わった
+     * {@value}: 動作モード通知。
+     * <table>
+     * <tr><th>mode</th><th>動作モード名</th></tr>
+     * </table>
      */
-    public static final String EVENT_DRONE_TYPE = "droneType";
+    public static final String EVENT_MODE = "mode";
+
     /**
-     * プロペラの駆動状態が変わった
+     * {@value}: 駆動状態通知。
+     * <table>
+     * <tr><th>arming</th><th>駆動していれば {@code true}、していなければ {@code false}</th></tr>
+     * </table>
      */
     public static final String EVENT_ARMING = "arming";
+
     /**
-     * 速度が変わった
+     * {@value}: 速度通知。
+     * <table>
+     * <tr><th>ground</th><th>対地速度</th></tr>
+     * <tr><th>air</th><th>対気速度</th></tr>
+     * <tr><th>vertical</th><th>垂直方向の速度</th></tr>
+     * </table>
      */
     public static final String EVENT_SPEED = "speed";
+
     /**
-     * バッテリーの状態が変わった
+     * {@value}: バッテリーの状態通知。
+     * <table>
+     * <tr><th>remain</th><th>残り</th></tr>
+     * <tr><th>voltage</th><th>電圧</th></tr>
+     * <tr><th>current</th><th>電流</th></tr>
+     * </table>
      */
     public static final String EVENT_BATTERY = "battery";
+
     /**
-     * 基点が変わった
+     * {@value}: 基点の通知。
+     * <table>
+     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * </table>
      */
     public static final String EVENT_HOME = "home";
+
     /**
-     * 高さが変わった
+     * {@value}: 高さの通知。
+     * <table>
+     * <tr><th>altitude</th><th>高さ</th></tr>
+     * </table>
      */
     public static final String EVENT_ALTITUDE = "altitude";
+
     /**
-     * GPS の示す位置が変わった
+     * {@value}: GPS の示す位置の通知。
+     * <table>
+     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * </table>
      */
     public static final String EVENT_GPS_POSITION = "gpsPosition";
+
     /**
-     * 保存してあるミッションを読み込んだ
+     * {@value}: 読み込んだミッションの通知。
+     * <table>
+     * <tr><th>commands</th><th>コマンド列</th></tr>
+     * </table>
      */
     public static final String EVENT_MISSION = "mission";
 
@@ -87,7 +143,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     private final ControlApi control;
     private final VehicleApi vehicle;
-    private final MissionApi mision;
+    private final MissionApi mission;
 
 
     public ArduCopter(String name, Handler handler, Context context) {
@@ -98,7 +154,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
         this.control = ControlApi.getApi(this.drone);
         this.vehicle = VehicleApi.getApi(this.drone);
-        this.mision = MissionApi.getApi(this.drone);
+        this.mission = MissionApi.getApi(this.drone);
 
 
         this.tower.connect(new MyTowerListener(this.tower, this.drone, handler, this));
@@ -201,7 +257,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * その場で止まる
      */
     @ModuleMethod
-    public void pauseAtCurrentLocation() {
+    public void pause() {
         this.control.pauseAtCurrentLocation(null);
     }
 
@@ -244,9 +300,9 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * プロペラの駆動切り替え
+     * 駆動切り替え
      *
-     * @param arm true ならプロペラを回す
+     * @param arm true なら駆動させる
      */
     @ModuleMethod
     public void arm(boolean arm) {
@@ -259,8 +315,13 @@ public class ArduCopter extends Emitter implements Cloneable {
      * @param newMode 動作モード
      */
     @ModuleMethod
-    public void setVehicleMode(String newMode) {
-        this.vehicle.setVehicleMode(VehicleMode.valueOf(newMode));
+    public void setMode(String newMode) {
+        final Type type = this.drone.getAttribute(AttributeType.TYPE);
+        final String prefix = MODE_PREFIXES.get(type.getDroneType());
+        if (prefix == null) {
+            throw new IllegalStateException("unsupported type");
+        }
+        this.vehicle.setVehicleMode(VehicleMode.valueOf(prefix + newMode.toUpperCase(Locale.US)));
     }
 
     /**
@@ -271,7 +332,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * @param altitude  高さ
      */
     @ModuleMethod
-    public void setVehicleHome(double latitude, double longitude, double altitude) {
+    public void setHome(double latitude, double longitude, double altitude) {
         this.vehicle.setVehicleHome(new LatLongAlt(latitude, longitude, altitude), null);
     }
 
@@ -282,7 +343,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void jumpToCommand(int index) {
-        this.mision.gotoWaypoint(index, null);
+        this.mission.gotoWaypoint(index, null);
     }
 
     /**
@@ -291,7 +352,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void loadMission() {
-        this.mision.loadWaypoints();
+        this.mission.loadWaypoints();
     }
 
     /**
@@ -307,12 +368,12 @@ public class ArduCopter extends Emitter implements Cloneable {
         for (MissionItem item : items) {
             currentMission.addMissionItem(item);
         }
-        this.mision.setMission(currentMission, true);
+        this.mission.setMission(currentMission, true);
     }
 
     @ModuleMethod
     public void startMission(boolean forceModeChange, boolean forceArm) {
-        this.mision.startMission(forceModeChange, forceArm, null);
+        this.mission.startMission(forceModeChange, forceArm, null);
     }
 
 }
