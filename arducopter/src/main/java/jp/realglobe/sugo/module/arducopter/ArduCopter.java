@@ -49,47 +49,92 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String CONNECT_TYPE_USB = "USB";
 
     /**
-     * 接続した
+     * {@value}: 接続した。
+     * 添付データ無し
      */
     public static final String EVENT_CONNECTED = "connected";
+
     /**
-     * 接続が切れた
+     * {@value}: 接続が切れた。
+     * 添付データ無し
      */
     public static final String EVENT_DISCONNECTED = "disconnected";
+
     /**
-     * 動作モードが変わった
+     * {@value}: 機種通知。
+     * <table>
+     * <tr><th>type</th><th>機種名</th></tr>
+     * <tr><th>firmware</th><th>ファームウェア名</th></tr>
+     * <tr><th>version</th><th>ファームウェアバージョン</th></tr>
+     * </table>
      */
-    public static final String EVENT_VEHICLE_MODE = "vehicleMode";
+    public static final String EVENT_TYPE = "type";
+
     /**
-     * 機種タイプが変わった
+     * {@value}: 動作モード通知。
+     * <table>
+     * <tr><th>mode</th><th>動作モード名</th></tr>
+     * </table>
      */
-    public static final String EVENT_DRONE_TYPE = "droneType";
+    public static final String EVENT_MODE = "mode";
+
     /**
-     * プロペラの駆動状態が変わった
+     * {@value}: 駆動状態通知。
+     * <table>
+     * <tr><th>arming</th><th>駆動していれば {@code true}、していなければ {@code false}</th></tr>
+     * </table>
      */
     public static final String EVENT_ARMING = "arming";
+
     /**
-     * 速度が変わった
+     * {@value}: 速度通知。
+     * <table>
+     * <tr><th>ground</th><th>対地速度</th></tr>
+     * <tr><th>air</th><th>対気速度</th></tr>
+     * <tr><th>vertical</th><th>垂直方向の速度</th></tr>
+     * </table>
      */
     public static final String EVENT_SPEED = "speed";
+
     /**
-     * バッテリーの状態が変わった
+     * {@value}: バッテリーの状態通知。
+     * <table>
+     * <tr><th>remain</th><th>残り</th></tr>
+     * <tr><th>voltage</th><th>電圧</th></tr>
+     * <tr><th>current</th><th>電流</th></tr>
+     * </table>
      */
     public static final String EVENT_BATTERY = "battery";
+
     /**
-     * 基点が変わった
+     * {@value}: 基点の通知。
+     * <table>
+     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * </table>
      */
     public static final String EVENT_HOME = "home";
+
     /**
-     * 高さが変わった
+     * {@value}: 高さの通知。
+     * <table>
+     * <tr><th>altitude</th><th>高さ</th></tr>
+     * </table>
      */
     public static final String EVENT_ALTITUDE = "altitude";
+
     /**
-     * GPS の示す位置が変わった
+     * {@value}: GPS の示す位置の通知。
+     * <table>
+     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * </table>
      */
     public static final String EVENT_GPS_POSITION = "gpsPosition";
+
     /**
-     * 保存してあるミッションを読み込んだ
+     * {@value}: 読み込んだミッションの通知。
+     * <table>
+     * <tr><th>commands</th><th>コマンド列</th></tr>
+     * </table>
      */
     public static final String EVENT_MISSION = "mission";
 
@@ -212,7 +257,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * その場で止まる
      */
     @ModuleMethod
-    public void pauseAtCurrentLocation() {
+    public void pause() {
         this.control.pauseAtCurrentLocation(null);
     }
 
@@ -255,9 +300,9 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * プロペラの駆動切り替え
+     * 駆動切り替え
      *
-     * @param arm true ならプロペラを回す
+     * @param arm true なら駆動させる
      */
     @ModuleMethod
     public void arm(boolean arm) {
@@ -270,7 +315,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * @param newMode 動作モード
      */
     @ModuleMethod
-    public void setVehicleMode(String newMode) {
+    public void setMode(String newMode) {
         final Type type = this.drone.getAttribute(AttributeType.TYPE);
         final String prefix = MODE_PREFIXES.get(type.getDroneType());
         if (prefix == null) {
@@ -287,7 +332,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * @param altitude  高さ
      */
     @ModuleMethod
-    public void setVehicleHome(double latitude, double longitude, double altitude) {
+    public void setHome(double latitude, double longitude, double altitude) {
         this.vehicle.setVehicleHome(new LatLongAlt(latitude, longitude, altitude), null);
     }
 
