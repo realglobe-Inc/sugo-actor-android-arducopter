@@ -21,8 +21,6 @@ before_install:
   - envsubst < .travis-gradle.properties.template > gradle.properties
 script:
   - ./gradlew build test
-before_deploy:
-  - sudo apt-get update && sudo apt-get install -qq language-pack-ja
 deploy:
   provider: script
   script: ./.travis-deploy.sh
