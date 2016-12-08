@@ -248,9 +248,9 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * 浮上
+     * 高さを変える
      *
-     * @param altitude 浮上する高さ
+     * @param altitude 高さ
      */
     @ModuleMethod
     public void climbTo(double altitude) {
