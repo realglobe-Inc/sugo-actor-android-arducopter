@@ -60,13 +60,13 @@ public final class Missions {
      * <table border=1>
      * <caption>データ</caption>
      * <tr><th>type</th><th>{@value}</th></tr>
-     * <tr><th>speed</th><th>指定する速さ</th></tr>
+     * <tr><th>speed</th><th>目標の速さ</th></tr>
      * </table>
      */
     public static final String COMMAND_CHANGE_SPEED = "changeSpeed";
 
     /**
-     * 離陸地点上空に戻れ。
+     * 初期地点上空に戻れ。
      * <table border=1>
      * <caption>データ</caption>
      * <tr><th>type</th><th>{@value}</th></tr>
