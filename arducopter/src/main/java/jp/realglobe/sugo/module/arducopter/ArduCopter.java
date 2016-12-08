@@ -22,7 +22,6 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import jp.realglobe.sugo.actor.Emitter;
 import jp.realglobe.sugo.actor.ModuleMethod;
@@ -379,7 +378,7 @@ public class ArduCopter extends Emitter implements Cloneable {
      * @param mission ミッション
      */
     @ModuleMethod
-    public void saveMission(List<Map<String, Object>> mission) {
+    public void saveMission(Object[] mission) {
         final List<MissionItem> items = Missions.decode(mission);
         Mission currentMission = new Mission();
         currentMission.clear();

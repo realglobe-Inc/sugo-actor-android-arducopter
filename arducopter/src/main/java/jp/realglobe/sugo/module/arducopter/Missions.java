@@ -156,10 +156,10 @@ public final class Missions {
      * @param items コマンドを表す JSON 互換のデータ列
      * @return コマンド列
      */
-    static List<MissionItem> decode(List<Map<String, Object>> items) {
+    static List<MissionItem> decode(Object[] items) {
         final List<MissionItem> decodedItems = new ArrayList<>();
-        for (Map<String, Object> item : items) {
-            decodedItems.add(decode(item));
+        for (Object item : items) {
+            decodedItems.add(decode((Map<String, Object>) item));
         }
         return decodedItems;
     }
@@ -227,7 +227,7 @@ public final class Missions {
             decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
         }
         if (item.containsKey(KEY_DELAY)) {
-            decoded.setDelay((double) item.get(KEY_DELAY));
+            decoded.setDelay(Numbers.decodeDouble(item.get(KEY_DELAY)));
         }
         return decoded;
     }
@@ -246,7 +246,7 @@ public final class Missions {
             decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
         }
         if (item.containsKey(KEY_DELAY)) {
-            decoded.setDelay((double) item.get(KEY_DELAY));
+            decoded.setDelay(Numbers.decodeDouble(item.get(KEY_DELAY)));
         }
         return decoded;
     }
@@ -261,7 +261,7 @@ public final class Missions {
     private static Takeoff decodeTakeoff(Map<String, Object> item) {
         final Takeoff decoded = new Takeoff();
         if (item.containsKey(KEY_ALTITUDE)) {
-            decoded.setTakeoffAltitude((double) item.get(KEY_ALTITUDE));
+            decoded.setTakeoffAltitude(Numbers.decodeDouble(item.get(KEY_ALTITUDE)));
         }
         return decoded;
     }
@@ -276,7 +276,7 @@ public final class Missions {
     private static ChangeSpeed decodeChangeSpeed(Map<String, Object> item) {
         final ChangeSpeed decoded = new ChangeSpeed();
         if (item.containsKey(KEY_SPEED)) {
-            decoded.setSpeed((double) item.get(KEY_SPEED));
+            decoded.setSpeed(Numbers.decodeDouble(item.get(KEY_SPEED)));
         }
         return decoded;
     }
@@ -291,7 +291,7 @@ public final class Missions {
     private static ReturnToLaunch decodeReturnToLaunch(Map<String, Object> item) {
         final ReturnToLaunch decoded = new ReturnToLaunch();
         if (item.containsKey(KEY_ALTITUDE)) {
-            decoded.setReturnAltitude((double) item.get(KEY_ALTITUDE));
+            decoded.setReturnAltitude(Numbers.decodeDouble(item.get(KEY_ALTITUDE)));
         }
         return decoded;
     }
@@ -326,10 +326,10 @@ public final class Missions {
             decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
         }
         if (item.containsKey(KEY_RADIUS)) {
-            decoded.setRadius((double) item.get(KEY_RADIUS));
+            decoded.setRadius(Numbers.decodeDouble(item.get(KEY_RADIUS)));
         }
         if (item.containsKey(KEY_TURNS)) {
-            decoded.setRadius((double) item.get(KEY_TURNS));
+            decoded.setTurns(Numbers.decodeInt(item.get(KEY_TURNS)));
         }
         return decoded;
     }
@@ -346,10 +346,10 @@ public final class Missions {
     private static YawCondition decodeYawCondition(Map<String, Object> item) {
         final YawCondition decoded = new YawCondition();
         if (item.containsKey(KEY_ANGLE)) {
-            decoded.setAngle((double) item.get(KEY_ANGLE));
+            decoded.setAngle(Numbers.decodeDouble(item.get(KEY_ANGLE)));
         }
         if (item.containsKey(KEY_ANGULAR_SPEED)) {
-            decoded.setAngularSpeed((double) item.get(KEY_ANGULAR_SPEED));
+            decoded.setAngularSpeed(Numbers.decodeDouble(item.get(KEY_ANGULAR_SPEED)));
         }
         if (item.containsKey(KEY_RELATIVE)) {
             decoded.setRelative((boolean) item.get(KEY_RELATIVE));
@@ -368,10 +368,10 @@ public final class Missions {
     private static DoJump decodeDoJump(Map<String, Object> item) {
         final DoJump decoded = new DoJump();
         if (item.containsKey(KEY_REPEAT_COUNT)) {
-            decoded.setRepeatCount((int) item.get(KEY_REPEAT_COUNT));
+            decoded.setRepeatCount(Numbers.decodeInt(item.get(KEY_REPEAT_COUNT)));
         }
         if (item.containsKey(KEY_INDEX)) {
-            decoded.setWaypoint((int) item.get(KEY_INDEX));
+            decoded.setWaypoint(Numbers.decodeInt(item.get(KEY_INDEX)));
         }
         return decoded;
     }
