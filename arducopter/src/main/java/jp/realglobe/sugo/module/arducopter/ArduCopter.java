@@ -90,12 +90,12 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String EVENT_ARMING = "arming";
 
     /**
-     * {@value}: 速度通知。
+     * {@value}: 速さ通知。
      * <table border=1>
      * <caption>添付データ</caption>
-     * <tr><th>ground</th><th>対地速度</th></tr>
-     * <tr><th>air</th><th>対気速度</th></tr>
-     * <tr><th>vertical</th><th>垂直方向の速度</th></tr>
+     * <tr><th>ground</th><th>対地速さ</th></tr>
+     * <tr><th>air</th><th>対気速さ</th></tr>
+     * <tr><th>vertical</th><th>垂直方向の速さ</th></tr>
      * </table>
      */
     public static final String EVENT_SPEED = "speed";
@@ -346,7 +346,8 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ミッション内の指定したコマンドに移る
+     * ミッション内の指定したコマンドに移る。
+     * ミッションについては {@link Missions} を参照
      *
      * @param index コマンド位置
      */
@@ -357,7 +358,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * ドローンに保存されているミッションを読み込む。
-     * ミッションは EVENT_MISSION イベントで受け取る
+     * ミッションは EVENT_MISSION イベントで受け取る。
+     * ミッションについては {@link Missions} を参照
      */
     @ModuleMethod
     public void loadMission() {
@@ -365,7 +367,8 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ドローンにミッションを保存する
+     * ドローンにミッションを保存する。
+     * ミッションについては {@link Missions} を参照
      *
      * @param mission ミッション
      */
@@ -380,6 +383,13 @@ public class ArduCopter extends Emitter implements Cloneable {
         this.mission.setMission(currentMission, true);
     }
 
+    /**
+     * ミッションの実行を開始する。
+     * ミッションについては {@link Missions} を参照
+     *
+     * @param forceModeChange ミッションを実行できるモードに自動で移るか
+     * @param forceArm        自動で駆動を開始するか
+     */
     @ModuleMethod
     public void startMission(boolean forceModeChange, boolean forceArm) {
         this.mission.startMission(forceModeChange, forceArm, null);

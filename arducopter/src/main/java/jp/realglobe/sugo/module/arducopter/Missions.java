@@ -18,20 +18,112 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ミッション周りの便利関数。
+ * ミッションについて。
  * Created by fukuchidaisuke on 16/12/05.
  */
-final class Missions {
+public final class Missions {
+
+    /**
+     * 指定点を通れ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>coordinate</th><th>指定点の座標</th></tr>
+     * <tr><th>delay</th><th>次の動作までの待機時間</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_WAYPOINT = "waypoint";
+
+    /**
+     * スプライン曲線の制御点として指定点を通れ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>coordinate</th><th>指定点の座標</th></tr>
+     * <tr><th>delay</th><th>次の動作までの待機時間</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_SPLINE_WAYPOINT = "splineWaypoint";
+
+    /**
+     * 離陸しろ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>altitude</th><th>離陸後の目標高さ</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_TAKEOFF = "takeoff";
+
+    /**
+     * 指定の速さに変えろ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>speed</th><th>指定する速さ</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_CHANGE_SPEED = "changeSpeed";
+
+    /**
+     * 離陸地点上空に戻れ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>altitude</th><th>戻ったあとの高さ</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_RETURN_TO_LAUNCH = "returnToLaunch";
+
+    /**
+     * 着陸しろ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_LAND = "land";
+
+    /**
+     * 指定点を中心に回れ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>coordinate</th><th>指定点の座標</th></tr>
+     * <tr><th>radius</th><th>半径</th></tr>
+     * <tr><th>turns</th><th>何回回るか</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_CIRCLE = "circle";
+
+    /**
+     * 向きを変えろ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>angle</th><th>角度</th></tr>
+     * <tr><th>angularSpeed</th><th>変える速度</th></tr>
+     * <tr><th>relative</th><th>相対的な角度かどうか</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_YAW_CONDITION = "yawCondition";
+
+    /**
+     * 指定のコマンドに移れ。
+     * <table border=1>
+     * <caption>データ</caption>
+     * <tr><th>type</th><th>{@value}</th></tr>
+     * <tr><th>repeatCount</th><th>繰り返し回数</th></tr>
+     * <tr><th>index</th><th>コマンド位置</th></tr>
+     * </table>
+     */
+    public static final String COMMAND_DO_JUMP = "doJump";
 
     private static final String KEY_TYPE = "type";
     private static final String KEY_COORDINATE = "coordinate";
-    private static final String KEY_ACCEPTANCE_RADIUS = "acceptanceRadius";
     private static final String KEY_DELAY = "delay";
-    private static final String KEY_ORBITAL_RADIUS = "orbitalRadius";
-    private static final String KEY_ORBIT_CCW = "orbitCcw";
     private static final String KEY_SPEED = "speed";
     private static final String KEY_ALTITUDE = "altitude";
-    private static final String KEY_PITCH = "pitch";
     private static final String KEY_RADIUS = "radius";
     private static final String KEY_TURNS = "turns";
     private static final String KEY_ANGLE = "angle";
@@ -39,6 +131,7 @@ final class Missions {
     private static final String KEY_RELATIVE = "relative";
     private static final String KEY_REPEAT_COUNT = "repeatCount";
     private static final String KEY_INDEX = "index";
+
 
     private Missions() {
     }
@@ -91,43 +184,40 @@ final class Missions {
         } else if (item instanceof DoJump) {
             return encode((DoJump) item);
         } else {
-            throw new IllegalArgumentException("unsupported mission item type " + item.getClass().getSimpleName());
+            throw new IllegalArgumentException("unsupported mission command type " + item.getClass().getSimpleName());
         }
     }
 
     private static MissionItem decode(Map<String, Object> item) {
         final String type = (String) item.get(KEY_TYPE);
-        if (Waypoint.class.getSimpleName().equals(type)) {
+        if (COMMAND_WAYPOINT.equals(type)) {
             return decodeWaypoint(item);
-        } else if (SplineWaypoint.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_SPLINE_WAYPOINT.equals(type)) {
             return decodeSplineWaypoint(item);
-        } else if (Takeoff.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_TAKEOFF.equals(type)) {
             return decodeTakeoff(item);
-        } else if (ChangeSpeed.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_CHANGE_SPEED.equals(type)) {
             return decodeChangeSpeed(item);
-        } else if (ReturnToLaunch.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_RETURN_TO_LAUNCH.equals(type)) {
             return decodeReturnToLaunch(item);
-        } else if (Land.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_LAND.equals(type)) {
             return decodeLand(item);
-        } else if (Circle.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_CIRCLE.equals(type)) {
             return decodeCircle(item);
-        } else if (YawCondition.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_YAW_CONDITION.equals(type)) {
             return decodeYawCondition(item);
-        } else if (DoJump.class.getSimpleName().equals(type)) {
+        } else if (COMMAND_DO_JUMP.equals(type)) {
             return decodeDoJump(item);
         } else {
-            throw new IllegalArgumentException("unsupported mission item type " + type);
+            throw new IllegalArgumentException("unsupported mission command type " + type);
         }
     }
 
     private static Map<String, Object> encode(Waypoint item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, Waypoint.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_WAYPOINT);
         encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
-        encoded.put(KEY_ACCEPTANCE_RADIUS, item.getAcceptanceRadius());
         encoded.put(KEY_DELAY, item.getDelay());
-        encoded.put(KEY_ORBITAL_RADIUS, item.getOrbitalRadius());
-        encoded.put(KEY_ORBIT_CCW, item.isOrbitCCW());
         return encoded;
     }
 
@@ -136,24 +226,15 @@ final class Missions {
         if (item.containsKey(KEY_COORDINATE)) {
             decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
         }
-        if (item.containsKey(KEY_ACCEPTANCE_RADIUS)) {
-            decoded.setAcceptanceRadius((double) item.get(KEY_ACCEPTANCE_RADIUS));
-        }
         if (item.containsKey(KEY_DELAY)) {
             decoded.setDelay((double) item.get(KEY_DELAY));
-        }
-        if (item.containsKey(KEY_ORBITAL_RADIUS)) {
-            decoded.setOrbitalRadius((double) item.get(KEY_ORBITAL_RADIUS));
-        }
-        if (item.containsKey(KEY_ORBIT_CCW)) {
-            decoded.setOrbitCCW((boolean) item.get(KEY_ORBIT_CCW));
         }
         return decoded;
     }
 
     private static Map<String, Object> encode(SplineWaypoint item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, SplineWaypoint.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_SPLINE_WAYPOINT);
         encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
         encoded.put(KEY_DELAY, item.getDelay());
         return encoded;
@@ -172,9 +253,8 @@ final class Missions {
 
     private static Map<String, Object> encode(Takeoff item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, Takeoff.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_TAKEOFF);
         encoded.put(KEY_ALTITUDE, item.getTakeoffAltitude());
-        encoded.put(KEY_PITCH, item.getTakeoffPitch());
         return encoded;
     }
 
@@ -183,15 +263,12 @@ final class Missions {
         if (item.containsKey(KEY_ALTITUDE)) {
             decoded.setTakeoffAltitude((double) item.get(KEY_ALTITUDE));
         }
-        if (item.containsKey(KEY_PITCH)) {
-            decoded.setTakeoffPitch((double) item.get(KEY_PITCH));
-        }
         return decoded;
     }
 
     private static Map<String, Object> encode(ChangeSpeed item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, ChangeSpeed.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_CHANGE_SPEED);
         encoded.put(KEY_SPEED, item.getSpeed());
         return encoded;
     }
@@ -206,7 +283,7 @@ final class Missions {
 
     private static Map<String, Object> encode(ReturnToLaunch item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, ReturnToLaunch.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_RETURN_TO_LAUNCH);
         encoded.put(KEY_ALTITUDE, item.getReturnAltitude());
         return encoded;
     }
@@ -221,7 +298,7 @@ final class Missions {
 
     private static Map<String, Object> encode(Land item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, Land.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_LAND);
         encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
         return encoded;
     }
@@ -236,7 +313,7 @@ final class Missions {
 
     private static Map<String, Object> encode(Circle item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, Circle.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_CIRCLE);
         encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
         encoded.put(KEY_RADIUS, item.getRadius());
         encoded.put(KEY_TURNS, item.getTurns());
@@ -259,7 +336,7 @@ final class Missions {
 
     private static Map<String, Object> encode(YawCondition item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, YawCondition.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_YAW_CONDITION);
         encoded.put(KEY_ANGLE, item.getAngle());
         encoded.put(KEY_ANGULAR_SPEED, item.getAngularSpeed());
         encoded.put(KEY_RELATIVE, item.isRelative());
@@ -282,7 +359,7 @@ final class Missions {
 
     private static Map<String, Object> encode(DoJump item) {
         final Map<String, Object> encoded = new HashMap<>();
-        encoded.put(KEY_TYPE, DoJump.class.getSimpleName());
+        encoded.put(KEY_TYPE, COMMAND_DO_JUMP);
         encoded.put(KEY_REPEAT_COUNT, item.getRepeatCount());
         encoded.put(KEY_INDEX, item.getWaypoint());
         return encoded;
