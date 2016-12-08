@@ -33,7 +33,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
     compile 'com.o3dr.android:dronekit-android:3.0.2'
-    compile(group: 'jp.realglobe', name: 'sugo-actor', version: '3.0.0') {
+    compile(group: 'jp.realglobe', name: 'sugo-actor', version: '3.0.1') {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
