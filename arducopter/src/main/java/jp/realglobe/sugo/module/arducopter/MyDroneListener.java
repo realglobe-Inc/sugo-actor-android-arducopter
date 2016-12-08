@@ -148,7 +148,7 @@ final class MyDroneListener implements DroneListener {
             }
 
             case AttributeEvent.MISSION_RECEIVED: {
-                final Mission mission = new Mission();
+                final Mission mission = this.drone.getAttribute(AttributeType.MISSION);
                 final Map<String, Object> data = new HashMap<>();
                 data.put(KEY_COMMANDS, Missions.encode(mission));
                 Log.d(LOG_TAG, "Drone mission received: " + data);
