@@ -155,6 +155,12 @@ final class MyDroneListener implements DroneListener {
                 break;
             }
 
+            case AttributeEvent.MISSION_SENT: {
+                Log.d(LOG_TAG, "Drone mission saved");
+                emitter.emit(ArduCopter.EVENT_MISSION_SAVED, null);
+                break;
+            }
+
             default: {
                 Log.d(LOG_TAG, "Drone event: " + event);
                 break;

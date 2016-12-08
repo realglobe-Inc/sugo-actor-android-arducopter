@@ -147,6 +147,12 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     public static final String EVENT_MISSION = "mission";
 
+    /**
+     * {@value}: ミッション保存完了通知。
+     * 添付データ無し
+     */
+    public static final String EVENT_MISSION_SAVED = "missionSaved";
+
     private final ControlTower tower;
     private final Drone drone;
 
