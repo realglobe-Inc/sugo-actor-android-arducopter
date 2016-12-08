@@ -62,7 +62,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 機種通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>type</th><th>機種名</th></tr>
      * <tr><th>firmware</th><th>ファームウェア名</th></tr>
      * <tr><th>version</th><th>ファームウェアバージョン</th></tr>
@@ -72,7 +73,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 動作モード通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>mode</th><th>動作モード名</th></tr>
      * </table>
      */
@@ -80,7 +82,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 駆動状態通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>arming</th><th>駆動していれば {@code true}、していなければ {@code false}</th></tr>
      * </table>
      */
@@ -88,7 +91,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 速度通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>ground</th><th>対地速度</th></tr>
      * <tr><th>air</th><th>対気速度</th></tr>
      * <tr><th>vertical</th><th>垂直方向の速度</th></tr>
@@ -98,7 +102,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: バッテリーの状態通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>remain</th><th>残り</th></tr>
      * <tr><th>voltage</th><th>電圧</th></tr>
      * <tr><th>current</th><th>電流</th></tr>
@@ -108,7 +113,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 基点の通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>coordinate</th><th>位置座標</th></tr>
      * </table>
      */
@@ -116,7 +122,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 高さの通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>altitude</th><th>高さ</th></tr>
      * </table>
      */
@@ -124,7 +131,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: GPS の示す位置の通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>coordinate</th><th>位置座標</th></tr>
      * </table>
      */
@@ -132,7 +140,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * {@value}: 読み込んだミッションの通知。
-     * <table>
+     * <table border=1>
+     * <caption>添付データ</caption>
      * <tr><th>commands</th><th>コマンド列</th></tr>
      * </table>
      */
