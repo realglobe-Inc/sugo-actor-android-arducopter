@@ -20,10 +20,6 @@ co(function * () {
   const actor = yield caller.connect(ACTOR)
   const arduCopter = actor.get('arduCopter')
 
-  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
-
-  yield asleep(5000)
-
   const takeoffAlt = 10
   const maxAlt = 50
   const moveDist = 0.001
@@ -31,7 +27,22 @@ co(function * () {
   // 1: 離陸
   // 2: 上昇
   // 3: 移動
-  let phase = 1
+  // 4: 着陸
+  let phase
+  arduCopter.on('mode', data => {
+    if (data.mode.toUpperCase() === 'GUIDED' && typeof phase === 'undefined') {
+      phase = 1
+      console.log('ARM')
+      arduCopter.arm(true)
+    }
+  })
+
+  arduCopter.on('arming', data => {
+    if (data.arming) {
+      console.log('TAKEOFF')
+      arduCopter.takeoff(takeoffAlt)
+    }
+  })
 
   arduCopter.on('altitude', data => {
     switch (phase) {
@@ -61,15 +72,6 @@ co(function * () {
         }
         break
       }
-      case 4: {
-        console.log('alt: ' + data.altitude)
-        if (data.altitude < 3) {
-          phase = 5
-          console.log('DISCONNECT')
-          caller.disconnect()
-        }
-        break
-      }
     }
   })
 
@@ -90,6 +92,13 @@ co(function * () {
           phase = 4
           console.log('LAND')
           arduCopter.land()
+
+          arduCopter.on('arming', data => {
+            if (!data.arming) {
+              console.log('DISCONNECT')
+              caller.disconnect()
+            }
+          })
         }
         break
       }
@@ -98,14 +107,7 @@ co(function * () {
     }
   })
 
-  arduCopter.on('arming', data => {
-    if (data.arming) {
-      console.log('TAKEOFF')
-      arduCopter.takeoff(takeoffAlt)
-    }
-  })
-
+  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
+  yield asleep(5000)
   yield arduCopter.setMode('GUIDED')
-  yield asleep(1000)
-  yield arduCopter.arm(true)
 }).catch((err) => console.error(err))

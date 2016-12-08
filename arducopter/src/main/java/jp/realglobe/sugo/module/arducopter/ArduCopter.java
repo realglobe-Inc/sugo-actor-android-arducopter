@@ -22,7 +22,6 @@ import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import jp.realglobe.sugo.actor.Emitter;
 import jp.realglobe.sugo.actor.ModuleMethod;
@@ -90,12 +89,12 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String EVENT_ARMING = "arming";
 
     /**
-     * {@value}: 速度通知。
+     * {@value}: 速さ通知。
      * <table border=1>
      * <caption>添付データ</caption>
-     * <tr><th>ground</th><th>対地速度</th></tr>
-     * <tr><th>air</th><th>対気速度</th></tr>
-     * <tr><th>vertical</th><th>垂直方向の速度</th></tr>
+     * <tr><th>ground</th><th>対地速さ</th></tr>
+     * <tr><th>air</th><th>対気速さ</th></tr>
+     * <tr><th>vertical</th><th>垂直方向の速さ</th></tr>
      * </table>
      */
     public static final String EVENT_SPEED = "speed";
@@ -146,6 +145,21 @@ public class ArduCopter extends Emitter implements Cloneable {
      * </table>
      */
     public static final String EVENT_MISSION = "mission";
+
+    /**
+     * {@value}: ミッション保存完了通知。
+     * 添付データ無し
+     */
+    public static final String EVENT_MISSION_SAVED = "missionSaved";
+
+    /**
+     * {@value}: 到達したミッションコマンドの通知。
+     * <table border=1>
+     * <caption>添付データ</caption>
+     * <tr><th>index</th><th>到達した位置</th></tr>
+     * </table>
+     */
+    public static final String EVENT_COMMAND_REACHED = "commandReached";
 
     private final ControlTower tower;
     private final Drone drone;
@@ -242,9 +256,9 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * 浮上
+     * 高さを変える
      *
-     * @param altitude 浮上する高さ
+     * @param altitude 高さ
      */
     @ModuleMethod
     public void climbTo(double altitude) {
@@ -346,7 +360,8 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ミッション内の指定したコマンドに移る
+     * ミッション内の指定したコマンドに移る。
+     * ミッションについては {@link Missions} を参照
      *
      * @param index コマンド位置
      */
@@ -357,7 +372,8 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * ドローンに保存されているミッションを読み込む。
-     * ミッションは EVENT_MISSION イベントで受け取る
+     * ミッションは EVENT_MISSION イベントで受け取る。
+     * ミッションについては {@link Missions} を参照
      */
     @ModuleMethod
     public void loadMission() {
@@ -365,12 +381,13 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * ドローンにミッションを保存する
+     * ドローンにミッションを保存する。
+     * ミッションについては {@link Missions} を参照
      *
      * @param mission ミッション
      */
     @ModuleMethod
-    public void saveMission(List<Map<String, Object>> mission) {
+    public void saveMission(Object[] mission) {
         final List<MissionItem> items = Missions.decode(mission);
         Mission currentMission = new Mission();
         currentMission.clear();
@@ -380,6 +397,13 @@ public class ArduCopter extends Emitter implements Cloneable {
         this.mission.setMission(currentMission, true);
     }
 
+    /**
+     * ミッションの実行を開始する。
+     * ミッションについては {@link Missions} を参照
+     *
+     * @param forceModeChange ミッションを実行できるモードに自動で移るか
+     * @param forceArm        自動で駆動を開始するか
+     */
     @ModuleMethod
     public void startMission(boolean forceModeChange, boolean forceArm) {
         this.mission.startMission(forceModeChange, forceArm, null);
