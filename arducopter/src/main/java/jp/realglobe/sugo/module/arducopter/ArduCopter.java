@@ -409,5 +409,14 @@ public class ArduCopter extends Emitter implements Cloneable {
         this.mission.startMission(forceModeChange, forceArm, null);
     }
 
+    /**
+     * ミッションの実行を一時停止する。
+     * ミッションについては {@link Missions} を参照
+     */
+    @ModuleMethod
+    public void pauseMission() {
+        this.mission.pauseMission(null);
+    }
+
 }
 
