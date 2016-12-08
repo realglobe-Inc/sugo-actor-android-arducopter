@@ -43,6 +43,7 @@ final class MyDroneListener implements DroneListener {
     private static final String KEY_COORDINATE = "coordinate";
     private static final String KEY_ALTITUDE = "altitude";
     private static final String KEY_COMMANDS = "commands";
+    private static final String KEY_INDEX = "index";
 
     private final Drone drone;
     private final Emitter emitter;
@@ -158,6 +159,15 @@ final class MyDroneListener implements DroneListener {
             case AttributeEvent.MISSION_SENT: {
                 Log.d(LOG_TAG, "Drone mission saved");
                 emitter.emit(ArduCopter.EVENT_MISSION_SAVED, null);
+                break;
+            }
+
+            case AttributeEvent.MISSION_ITEM_REACHED: {
+                final Mission mission = this.drone.getAttribute(AttributeType.MISSION);
+                final Map<String, Object> data = new HashMap<>();
+                data.put(KEY_INDEX, mission.getCurrentMissionItem());
+                Log.d(LOG_TAG, "Drone mission command reached: " + data);
+                emitter.emit(ArduCopter.EVENT_COMMAND_REACHED, data);
                 break;
             }
 
