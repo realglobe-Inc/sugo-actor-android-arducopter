@@ -5,8 +5,9 @@ import android.util.Log;
 
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
-import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.android.client.interfaces.TowerListener;
+
+import java.util.Collection;
 
 import jp.realglobe.sugo.actor.Emitter;
 
@@ -21,7 +22,7 @@ final class MyTowerListener implements TowerListener {
     private final ControlTower tower;
     private final Drone drone;
     private final Handler handler;
-    private final DroneListener droneListener;
+    private final MyDroneListener droneListener;
 
     MyTowerListener(ControlTower tower, Drone drone, Handler handler, Emitter emitter) {
         this.tower = tower;
@@ -42,6 +43,14 @@ final class MyTowerListener implements TowerListener {
         Log.d(LOG_TAG, "Drone tower disconnected");
         //this.tower.unregisterDrone(this.drone);
         this.drone.unregisterDroneListener(this.droneListener);
+    }
+
+    void enableEvents(Collection<Event> events) {
+        this.droneListener.enableEvents(events);
+    }
+
+    void disableEvents(Collection<Event> events) {
+        this.droneListener.disableEvents(events);
     }
 
 }
