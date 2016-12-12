@@ -63,5 +63,13 @@ co(function * () {
 
   yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
   yield asleep(5000)
+  yield arduCopter.disableEvents(null)
+  yield arduCopter.enableEvents([
+    'commandReached',
+    'disarmed',
+    'missionSaved',
+    'mode',
+    'position'
+  ])
   yield arduCopter.setMode('GUIDED')
 }).catch((err) => console.error(err))
