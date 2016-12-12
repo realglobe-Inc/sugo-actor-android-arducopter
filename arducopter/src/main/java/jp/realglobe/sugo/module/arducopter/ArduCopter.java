@@ -19,6 +19,9 @@ import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,113 +49,6 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String CONNECT_TYPE_UDP = "UDP";
     public static final String CONNECT_TYPE_USB = "USB";
 
-    /**
-     * {@value}: 接続した。
-     * 添付データ無し
-     */
-    public static final String EVENT_CONNECTED = "connected";
-
-    /**
-     * {@value}: 接続が切れた。
-     * 添付データ無し
-     */
-    public static final String EVENT_DISCONNECTED = "disconnected";
-
-    /**
-     * {@value}: 機種通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>type</th><th>機種名</th></tr>
-     * <tr><th>firmware</th><th>ファームウェア名</th></tr>
-     * <tr><th>version</th><th>ファームウェアバージョン</th></tr>
-     * </table>
-     */
-    public static final String EVENT_TYPE = "type";
-
-    /**
-     * {@value}: 動作モード通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>mode</th><th>動作モード名</th></tr>
-     * </table>
-     */
-    public static final String EVENT_MODE = "mode";
-
-    /**
-     * {@value}: 駆動開始通知。
-     * 添付データ無し
-     */
-    public static final String EVENT_ARMED = "armed";
-
-    /**
-     * {@value}: 駆動終了通知。
-     * 添付データ無し
-     */
-    public static final String EVENT_DISARMED = "disarmed";
-
-    /**
-     * {@value}: 速さ通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>ground</th><th>対地速さ</th></tr>
-     * <tr><th>air</th><th>対気速さ</th></tr>
-     * <tr><th>vertical</th><th>垂直方向の速さ</th></tr>
-     * </table>
-     */
-    public static final String EVENT_SPEED = "speed";
-
-    /**
-     * {@value}: バッテリーの状態通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>remain</th><th>残り</th></tr>
-     * <tr><th>voltage</th><th>電圧</th></tr>
-     * <tr><th>current</th><th>電流</th></tr>
-     * </table>
-     */
-    public static final String EVENT_BATTERY = "battery";
-
-    /**
-     * {@value}: 起点の通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>coordinate</th><th>位置座標</th></tr>
-     * </table>
-     */
-    public static final String EVENT_HOME = "home";
-
-    /**
-     * {@value}: 現在位置の通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>coordinate</th><th>位置座標</th></tr>
-     * </table>
-     */
-    public static final String EVENT_POSITION = "position";
-
-    /**
-     * {@value}: 読み込んだミッションの通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>commands</th><th>コマンド列</th></tr>
-     * </table>
-     */
-    public static final String EVENT_MISSION = "mission";
-
-    /**
-     * {@value}: ミッション保存完了通知。
-     * 添付データ無し
-     */
-    public static final String EVENT_MISSION_SAVED = "missionSaved";
-
-    /**
-     * {@value}: 到達したミッションコマンドの通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>index</th><th>到達した位置</th></tr>
-     * </table>
-     */
-    public static final String EVENT_COMMAND_REACHED = "commandReached";
 
     private final ControlTower tower;
     private final Drone drone;
@@ -161,7 +57,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     private final VehicleApi vehicle;
     private final MissionApi mission;
     private final DroneWrapper info;
-
+    private final MyTowerListener listener;
 
     public ArduCopter(String name, Handler handler, Context context) {
         super(name);
@@ -174,7 +70,8 @@ public class ArduCopter extends Emitter implements Cloneable {
         this.mission = MissionApi.getApi(this.drone);
         this.info = new DroneWrapper(this.drone);
 
-        this.tower.connect(new MyTowerListener(this.tower, this.drone, handler, this));
+        this.listener = new MyTowerListener(this.tower, this.drone, handler, this);
+        this.tower.connect(this.listener);
     }
 
 
@@ -441,7 +338,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 機種を返す
      *
-     * @return 機種情報。{@link #EVENT_TYPE} を参照
+     * @return 機種情報。{@link Event#type} を参照
      */
     @ModuleMethod
     public Map<String, Object> getType() {
@@ -451,7 +348,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 動作モードを返す
      *
-     * @return 動作モード情報。{@link #EVENT_MODE} を参照
+     * @return 動作モード情報。{@link Event#mode} を参照
      */
     @ModuleMethod
     public Map<String, Object> getMode() {
@@ -461,7 +358,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 速さを返す
      *
-     * @return 速さ情報。{@link #EVENT_SPEED} を参照
+     * @return 速さ情報。{@link Event#speed} を参照
      */
     @ModuleMethod
     public Map<String, Object> getSpeed() {
@@ -471,7 +368,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * バッテリー状態を返す
      *
-     * @return バッテリー状態情報。{@link #EVENT_BATTERY} を参照
+     * @return バッテリー状態情報。{@link Event#battery} を参照
      */
     @ModuleMethod
     public Map<String, Object> getBattery() {
@@ -481,7 +378,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 起点を返す
      *
-     * @return 起点情報。{@link #EVENT_HOME} を参照
+     * @return 起点情報。{@link Event#home} を参照
      */
     @ModuleMethod
     public Map<String, Object> getHome() {
@@ -491,7 +388,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 現在位置を返す
      *
-     * @return 現在位置情報。{@link #EVENT_POSITION} を参照
+     * @return 現在位置情報。{@link Event#position} を参照
      */
     @ModuleMethod
     public Map<String, Object> getPosition() {
@@ -501,7 +398,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 読み込んだミッションを返す
      *
-     * @return 読み込んだミッション情報。{@link #EVENT_MISSION} を参照
+     * @return 読み込んだミッション情報。{@link Event#mission} を参照
      */
     @ModuleMethod
     public Map<String, Object> getMission() {
@@ -511,12 +408,42 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 到達したミッションコマンドを返す
      *
-     * @return 到達したミッションコマンド情報。{@link #EVENT_COMMAND_REACHED} を参照
+     * @return 到達したミッションコマンド情報。{@link Event#commandReached} を参照
      */
     @ModuleMethod
     public Map<String, Object> getReachedCommand() {
         return this.info.getReachedCommand();
     }
 
-}
+    /**
+     * イベントを有効にする
+     *
+     * @param events 有効化するイベント。null なら全てのイベントを有効化する
+     */
+    @ModuleMethod
+    public void enableEvents(Object[] events) {
+        this.listener.enableEvents(parseEvents(events));
+    }
 
+    /**
+     * イベントを無効にする
+     *
+     * @param events 無効化するイベント。null なら全てのイベントを無効化する
+     */
+    @ModuleMethod
+    public void disableEvents(Object[] events) {
+        this.listener.disableEvents(parseEvents(events));
+    }
+
+    private List<Event> parseEvents(Object[] events) {
+        if (events == null) {
+            return Arrays.asList(Event.values());
+        }
+        final List<Event> list = new ArrayList<>();
+        for (Object event : events) {
+            list.add(Event.valueOf((String) event));
+        }
+        return list;
+    }
+
+}

@@ -7,6 +7,10 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
+
 import jp.realglobe.sugo.actor.Emitter;
 
 /**
@@ -20,12 +24,14 @@ final class MyDroneListener implements DroneListener {
     private final DroneWrapper drone;
     private final Emitter emitter;
 
+    private final Set<Event> enableEvents;
     private Object lastPosition;
 
     MyDroneListener(Drone drone, Emitter emitter) {
         this.drone = new DroneWrapper(drone);
         this.emitter = emitter;
 
+        this.enableEvents = EnumSet.noneOf(Event.class);
         this.lastPosition = null;
     }
 
@@ -34,37 +40,37 @@ final class MyDroneListener implements DroneListener {
         switch (event) {
             case AttributeEvent.STATE_CONNECTED: {
                 Log.d(LOG_TAG, "Drone connected");
-                emitter.emit(ArduCopter.EVENT_CONNECTED, null);
+                emit(Event.connected, null);
                 break;
             }
 
             case AttributeEvent.STATE_DISCONNECTED: {
                 Log.d(LOG_TAG, "Drone disconnected");
-                emitter.emit(ArduCopter.EVENT_DISCONNECTED, null);
+                emit(Event.disconnected, null);
                 break;
             }
 
             case AttributeEvent.TYPE_UPDATED: {
                 final Object data = this.drone.getType();
                 Log.d(LOG_TAG, "Drone type updated: " + data);
-                emitter.emit(ArduCopter.EVENT_TYPE, data);
+                emit(Event.type, data);
                 break;
             }
 
             case AttributeEvent.STATE_VEHICLE_MODE: {
                 final Object data = this.drone.getMode();
                 Log.d(LOG_TAG, "Drone mode updated: " + data);
-                emitter.emit(ArduCopter.EVENT_MODE, data);
+                emit(Event.mode, data);
                 break;
             }
 
             case AttributeEvent.STATE_ARMING: {
                 if (this.drone.isArmed()) {
                     Log.d(LOG_TAG, "Drone armed");
-                    emitter.emit(ArduCopter.EVENT_ARMED, null);
+                    emit(Event.armed, null);
                 } else {
                     Log.d(LOG_TAG, "Drone disarmed");
-                    emitter.emit(ArduCopter.EVENT_DISARMED, null);
+                    emit(Event.disarmed, null);
                 }
                 break;
             }
@@ -72,21 +78,21 @@ final class MyDroneListener implements DroneListener {
             case AttributeEvent.SPEED_UPDATED: {
                 final Object data = this.drone.getSpeed();
                 Log.d(LOG_TAG, "Drone speed updated: " + data);
-                emitter.emit(ArduCopter.EVENT_SPEED, data);
+                emit(Event.speed, data);
                 break;
             }
 
             case AttributeEvent.BATTERY_UPDATED: {
                 final Object data = this.drone.getBattery();
                 Log.d(LOG_TAG, "Drone battery updated: " + data);
-                emitter.emit(ArduCopter.EVENT_BATTERY, data);
+                emit(Event.battery, data);
                 break;
             }
 
             case AttributeEvent.HOME_UPDATED: {
                 final Object data = this.drone.getHome();
                 Log.d(LOG_TAG, "Drone home updated: " + data);
-                emitter.emit(ArduCopter.EVENT_HOME, data);
+                emit(Event.home, data);
                 break;
             }
 
@@ -97,7 +103,7 @@ final class MyDroneListener implements DroneListener {
                 }
                 this.lastPosition = data;
                 Log.d(LOG_TAG, "Drone altitude updated: " + data);
-                emitter.emit(ArduCopter.EVENT_POSITION, data);
+                emit(Event.position, data);
                 break;
             }
 
@@ -108,27 +114,27 @@ final class MyDroneListener implements DroneListener {
                 }
                 this.lastPosition = data;
                 Log.d(LOG_TAG, "Drone GPS position updated: " + data);
-                emitter.emit(ArduCopter.EVENT_POSITION, data);
+                emit(Event.position, data);
                 break;
             }
 
             case AttributeEvent.MISSION_RECEIVED: {
                 final Object data = this.drone.getMission();
                 Log.d(LOG_TAG, "Drone mission received: " + data);
-                emitter.emit(ArduCopter.EVENT_MISSION, data);
+                emit(Event.mission, data);
                 break;
             }
 
             case AttributeEvent.MISSION_SENT: {
                 Log.d(LOG_TAG, "Drone mission saved");
-                emitter.emit(ArduCopter.EVENT_MISSION_SAVED, null);
+                emit(Event.missionSaved, null);
                 break;
             }
 
             case AttributeEvent.MISSION_ITEM_REACHED: {
                 final Object data = this.drone.getReachedCommand();
                 Log.d(LOG_TAG, "Drone mission command reached: " + data);
-                emitter.emit(ArduCopter.EVENT_COMMAND_REACHED, data);
+                emit(Event.commandReached, data);
                 break;
             }
 
@@ -144,4 +150,17 @@ final class MyDroneListener implements DroneListener {
         Log.d(LOG_TAG, "Drone interrupted");
     }
 
+    private synchronized void emit(Event event, Object data) {
+        if (this.enableEvents.contains(event)) {
+            this.emitter.emit(event.name(), data);
+        }
+    }
+
+    synchronized void enableEvents(Collection<Event> events) {
+        this.enableEvents.addAll(events);
+    }
+
+    synchronized void disableEvents(Collection<Event> events) {
+        this.enableEvents.removeAll(events);
+    }
 }
