@@ -19,7 +19,7 @@ co(function * () {
   const moveDist = 0.001
 
   var gps
-  arduCopter.on('gpsPosition', data => { gps = data.coordinate })
+  arduCopter.on('position', data => { gps = data.coordinate })
 
   var mission
   arduCopter.on('mode', data => {
@@ -38,7 +38,7 @@ co(function * () {
         coordinate: goal
       }, {
         type: 'circle',
-        coordinate: goal,
+        coordinate: [0, 0, 0],
         radius: 25,
         turns: 2
       }, {
@@ -53,11 +53,9 @@ co(function * () {
 
     arduCopter.startMission(true, true)
 
-    arduCopter.on('arming', data => {
-      if (!data.arming) {
-        console.log('DISCONNECT')
-        caller.disconnect()
-      }
+    arduCopter.on('disarmed', () => {
+      console.log('DISCONNECT')
+      caller.disconnect()
     })
   })
 

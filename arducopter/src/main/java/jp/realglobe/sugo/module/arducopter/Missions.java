@@ -143,235 +143,235 @@ public final class Missions {
      * @return ミッションを表す JSON 互換データ
      */
     static List<Map<String, Object>> encode(Mission mission) {
-        final List<Map<String, Object>> encodedItems = new ArrayList<>();
-        for (MissionItem item : mission.getMissionItems()) {
-            encodedItems.add(encode(item));
+        final List<Map<String, Object>> encodedCommands = new ArrayList<>();
+        for (MissionItem command : mission.getMissionItems()) {
+            encodedCommands.add(encode(command));
         }
-        return encodedItems;
+        return encodedCommands;
     }
 
     /**
      * JSON 互換形式から変換する
      *
-     * @param items コマンドを表す JSON 互換のデータ列
-     * @return コマンド列
+     * @param commands ミッションを表す JSON 互換データ
+     * @return ミッション
      */
-    static List<MissionItem> decode(Object[] items) {
-        final List<MissionItem> decodedItems = new ArrayList<>();
-        for (Object item : items) {
-            decodedItems.add(decode((Map<String, Object>) item));
+    static Mission decode(Object[] commands) {
+        final Mission mission = new Mission();
+        for (Object command : commands) {
+            mission.addMissionItem(decodeCommand((Map<String, Object>) command));
         }
-        return decodedItems;
+        return mission;
     }
 
-    private static Map<String, Object> encode(MissionItem item) {
-        if (item instanceof Waypoint) {
-            return encode((Waypoint) item);
-        } else if (item instanceof SplineWaypoint) {
-            return encode((SplineWaypoint) item);
-        } else if (item instanceof Takeoff) {
-            return encode((Takeoff) item);
-        } else if (item instanceof ChangeSpeed) {
-            return encode((ChangeSpeed) item);
-        } else if (item instanceof ReturnToLaunch) {
-            return encode((ReturnToLaunch) item);
-        } else if (item instanceof Land) {
-            return encode((Land) item);
-        } else if (item instanceof Circle) {
-            return encode((Circle) item);
-        } else if (item instanceof YawCondition) {
-            return encode((YawCondition) item);
-        } else if (item instanceof DoJump) {
-            return encode((DoJump) item);
+    private static Map<String, Object> encode(MissionItem command) {
+        if (command instanceof Waypoint) {
+            return encode((Waypoint) command);
+        } else if (command instanceof SplineWaypoint) {
+            return encode((SplineWaypoint) command);
+        } else if (command instanceof Takeoff) {
+            return encode((Takeoff) command);
+        } else if (command instanceof ChangeSpeed) {
+            return encode((ChangeSpeed) command);
+        } else if (command instanceof ReturnToLaunch) {
+            return encode((ReturnToLaunch) command);
+        } else if (command instanceof Land) {
+            return encode((Land) command);
+        } else if (command instanceof Circle) {
+            return encode((Circle) command);
+        } else if (command instanceof YawCondition) {
+            return encode((YawCondition) command);
+        } else if (command instanceof DoJump) {
+            return encode((DoJump) command);
         } else {
-            throw new IllegalArgumentException("unsupported mission command type " + item.getClass().getSimpleName());
+            throw new IllegalArgumentException("unsupported mission command type " + command.getClass().getSimpleName());
         }
     }
 
-    private static MissionItem decode(Map<String, Object> item) {
-        final String type = (String) item.get(KEY_TYPE);
+    private static MissionItem decodeCommand(Map<String, Object> command) {
+        final String type = (String) command.get(KEY_TYPE);
         if (COMMAND_WAYPOINT.equals(type)) {
-            return decodeWaypoint(item);
+            return decodeWaypoint(command);
         } else if (COMMAND_SPLINE_WAYPOINT.equals(type)) {
-            return decodeSplineWaypoint(item);
+            return decodeSplineWaypoint(command);
         } else if (COMMAND_TAKEOFF.equals(type)) {
-            return decodeTakeoff(item);
+            return decodeTakeoff(command);
         } else if (COMMAND_CHANGE_SPEED.equals(type)) {
-            return decodeChangeSpeed(item);
+            return decodeChangeSpeed(command);
         } else if (COMMAND_RETURN_TO_LAUNCH.equals(type)) {
-            return decodeReturnToLaunch(item);
+            return decodeReturnToLaunch(command);
         } else if (COMMAND_LAND.equals(type)) {
-            return decodeLand(item);
+            return decodeLand(command);
         } else if (COMMAND_CIRCLE.equals(type)) {
-            return decodeCircle(item);
+            return decodeCircle(command);
         } else if (COMMAND_YAW_CONDITION.equals(type)) {
-            return decodeYawCondition(item);
+            return decodeYawCondition(command);
         } else if (COMMAND_DO_JUMP.equals(type)) {
-            return decodeDoJump(item);
+            return decodeDoJump(command);
         } else {
             throw new IllegalArgumentException("unsupported mission command type " + type);
         }
     }
 
-    private static Map<String, Object> encode(Waypoint item) {
+    private static Map<String, Object> encode(Waypoint command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_WAYPOINT);
-        encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
-        encoded.put(KEY_DELAY, item.getDelay());
+        encoded.put(KEY_COORDINATE, Coordinates.encode(command.getCoordinate()));
+        encoded.put(KEY_DELAY, command.getDelay());
         return encoded;
     }
 
-    private static Waypoint decodeWaypoint(Map<String, Object> item) {
+    private static Waypoint decodeWaypoint(Map<String, Object> command) {
         final Waypoint decoded = new Waypoint();
-        if (item.containsKey(KEY_COORDINATE)) {
-            decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
+        if (command.containsKey(KEY_COORDINATE)) {
+            decoded.setCoordinate(Coordinates.decodeLatLongAlt(command.get(KEY_COORDINATE)));
         }
-        if (item.containsKey(KEY_DELAY)) {
-            decoded.setDelay(Numbers.decodeDouble(item.get(KEY_DELAY)));
+        if (command.containsKey(KEY_DELAY)) {
+            decoded.setDelay(Numbers.decodeDouble(command.get(KEY_DELAY)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(SplineWaypoint item) {
+    private static Map<String, Object> encode(SplineWaypoint command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_SPLINE_WAYPOINT);
-        encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
-        encoded.put(KEY_DELAY, item.getDelay());
+        encoded.put(KEY_COORDINATE, Coordinates.encode(command.getCoordinate()));
+        encoded.put(KEY_DELAY, command.getDelay());
         return encoded;
     }
 
-    private static SplineWaypoint decodeSplineWaypoint(Map<String, Object> item) {
+    private static SplineWaypoint decodeSplineWaypoint(Map<String, Object> command) {
         final SplineWaypoint decoded = new SplineWaypoint();
-        if (item.containsKey(KEY_COORDINATE)) {
-            decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
+        if (command.containsKey(KEY_COORDINATE)) {
+            decoded.setCoordinate(Coordinates.decodeLatLongAlt(command.get(KEY_COORDINATE)));
         }
-        if (item.containsKey(KEY_DELAY)) {
-            decoded.setDelay(Numbers.decodeDouble(item.get(KEY_DELAY)));
+        if (command.containsKey(KEY_DELAY)) {
+            decoded.setDelay(Numbers.decodeDouble(command.get(KEY_DELAY)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(Takeoff item) {
+    private static Map<String, Object> encode(Takeoff command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_TAKEOFF);
-        encoded.put(KEY_ALTITUDE, item.getTakeoffAltitude());
+        encoded.put(KEY_ALTITUDE, command.getTakeoffAltitude());
         return encoded;
     }
 
-    private static Takeoff decodeTakeoff(Map<String, Object> item) {
+    private static Takeoff decodeTakeoff(Map<String, Object> command) {
         final Takeoff decoded = new Takeoff();
-        if (item.containsKey(KEY_ALTITUDE)) {
-            decoded.setTakeoffAltitude(Numbers.decodeDouble(item.get(KEY_ALTITUDE)));
+        if (command.containsKey(KEY_ALTITUDE)) {
+            decoded.setTakeoffAltitude(Numbers.decodeDouble(command.get(KEY_ALTITUDE)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(ChangeSpeed item) {
+    private static Map<String, Object> encode(ChangeSpeed command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_CHANGE_SPEED);
-        encoded.put(KEY_SPEED, item.getSpeed());
+        encoded.put(KEY_SPEED, command.getSpeed());
         return encoded;
     }
 
-    private static ChangeSpeed decodeChangeSpeed(Map<String, Object> item) {
+    private static ChangeSpeed decodeChangeSpeed(Map<String, Object> command) {
         final ChangeSpeed decoded = new ChangeSpeed();
-        if (item.containsKey(KEY_SPEED)) {
-            decoded.setSpeed(Numbers.decodeDouble(item.get(KEY_SPEED)));
+        if (command.containsKey(KEY_SPEED)) {
+            decoded.setSpeed(Numbers.decodeDouble(command.get(KEY_SPEED)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(ReturnToLaunch item) {
+    private static Map<String, Object> encode(ReturnToLaunch command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_RETURN_TO_LAUNCH);
-        encoded.put(KEY_ALTITUDE, item.getReturnAltitude());
+        encoded.put(KEY_ALTITUDE, command.getReturnAltitude());
         return encoded;
     }
 
-    private static ReturnToLaunch decodeReturnToLaunch(Map<String, Object> item) {
+    private static ReturnToLaunch decodeReturnToLaunch(Map<String, Object> command) {
         final ReturnToLaunch decoded = new ReturnToLaunch();
-        if (item.containsKey(KEY_ALTITUDE)) {
-            decoded.setReturnAltitude(Numbers.decodeDouble(item.get(KEY_ALTITUDE)));
+        if (command.containsKey(KEY_ALTITUDE)) {
+            decoded.setReturnAltitude(Numbers.decodeDouble(command.get(KEY_ALTITUDE)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(Land item) {
+    private static Map<String, Object> encode(Land command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_LAND);
-        encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
+        encoded.put(KEY_COORDINATE, Coordinates.encode(command.getCoordinate()));
         return encoded;
     }
 
-    private static Land decodeLand(Map<String, Object> item) {
+    private static Land decodeLand(Map<String, Object> command) {
         final Land decoded = new Land();
-        if (item.containsKey(KEY_COORDINATE)) {
-            decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
+        if (command.containsKey(KEY_COORDINATE)) {
+            decoded.setCoordinate(Coordinates.decodeLatLongAlt(command.get(KEY_COORDINATE)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(Circle item) {
+    private static Map<String, Object> encode(Circle command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_CIRCLE);
-        encoded.put(KEY_COORDINATE, Coordinates.encode(item.getCoordinate()));
-        encoded.put(KEY_RADIUS, item.getRadius());
-        encoded.put(KEY_TURNS, item.getTurns());
+        encoded.put(KEY_COORDINATE, Coordinates.encode(command.getCoordinate()));
+        encoded.put(KEY_RADIUS, command.getRadius());
+        encoded.put(KEY_TURNS, command.getTurns());
         return encoded;
     }
 
-    private static Circle decodeCircle(Map<String, Object> item) {
+    private static Circle decodeCircle(Map<String, Object> command) {
         final Circle decoded = new Circle();
-        if (item.containsKey(KEY_COORDINATE)) {
-            decoded.setCoordinate(Coordinates.decodeLatLongAlt(item.get(KEY_COORDINATE)));
+        if (command.containsKey(KEY_COORDINATE)) {
+            decoded.setCoordinate(Coordinates.decodeLatLongAlt(command.get(KEY_COORDINATE)));
         }
-        if (item.containsKey(KEY_RADIUS)) {
-            decoded.setRadius(Numbers.decodeDouble(item.get(KEY_RADIUS)));
+        if (command.containsKey(KEY_RADIUS)) {
+            decoded.setRadius(Numbers.decodeDouble(command.get(KEY_RADIUS)));
         }
-        if (item.containsKey(KEY_TURNS)) {
-            decoded.setTurns(Numbers.decodeInt(item.get(KEY_TURNS)));
+        if (command.containsKey(KEY_TURNS)) {
+            decoded.setTurns(Numbers.decodeInt(command.get(KEY_TURNS)));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(YawCondition item) {
+    private static Map<String, Object> encode(YawCondition command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_YAW_CONDITION);
-        encoded.put(KEY_ANGLE, item.getAngle());
-        encoded.put(KEY_ANGULAR_SPEED, item.getAngularSpeed());
-        encoded.put(KEY_RELATIVE, item.isRelative());
+        encoded.put(KEY_ANGLE, command.getAngle());
+        encoded.put(KEY_ANGULAR_SPEED, command.getAngularSpeed());
+        encoded.put(KEY_RELATIVE, command.isRelative());
         return encoded;
     }
 
-    private static YawCondition decodeYawCondition(Map<String, Object> item) {
+    private static YawCondition decodeYawCondition(Map<String, Object> command) {
         final YawCondition decoded = new YawCondition();
-        if (item.containsKey(KEY_ANGLE)) {
-            decoded.setAngle(Numbers.decodeDouble(item.get(KEY_ANGLE)));
+        if (command.containsKey(KEY_ANGLE)) {
+            decoded.setAngle(Numbers.decodeDouble(command.get(KEY_ANGLE)));
         }
-        if (item.containsKey(KEY_ANGULAR_SPEED)) {
-            decoded.setAngularSpeed(Numbers.decodeDouble(item.get(KEY_ANGULAR_SPEED)));
+        if (command.containsKey(KEY_ANGULAR_SPEED)) {
+            decoded.setAngularSpeed(Numbers.decodeDouble(command.get(KEY_ANGULAR_SPEED)));
         }
-        if (item.containsKey(KEY_RELATIVE)) {
-            decoded.setRelative((boolean) item.get(KEY_RELATIVE));
+        if (command.containsKey(KEY_RELATIVE)) {
+            decoded.setRelative((boolean) command.get(KEY_RELATIVE));
         }
         return decoded;
     }
 
-    private static Map<String, Object> encode(DoJump item) {
+    private static Map<String, Object> encode(DoJump command) {
         final Map<String, Object> encoded = new HashMap<>();
         encoded.put(KEY_TYPE, COMMAND_DO_JUMP);
-        encoded.put(KEY_REPEAT_COUNT, item.getRepeatCount());
-        encoded.put(KEY_INDEX, item.getWaypoint());
+        encoded.put(KEY_REPEAT_COUNT, command.getRepeatCount());
+        encoded.put(KEY_INDEX, command.getWaypoint());
         return encoded;
     }
 
-    private static DoJump decodeDoJump(Map<String, Object> item) {
+    private static DoJump decodeDoJump(Map<String, Object> command) {
         final DoJump decoded = new DoJump();
-        if (item.containsKey(KEY_REPEAT_COUNT)) {
-            decoded.setRepeatCount(Numbers.decodeInt(item.get(KEY_REPEAT_COUNT)));
+        if (command.containsKey(KEY_REPEAT_COUNT)) {
+            decoded.setRepeatCount(Numbers.decodeInt(command.get(KEY_REPEAT_COUNT)));
         }
-        if (item.containsKey(KEY_INDEX)) {
-            decoded.setWaypoint(Numbers.decodeInt(item.get(KEY_INDEX)));
+        if (command.containsKey(KEY_INDEX)) {
+            decoded.setWaypoint(Numbers.decodeInt(command.get(KEY_INDEX)));
         }
         return decoded;
     }

@@ -16,12 +16,11 @@ import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
 import com.o3dr.services.android.lib.drone.connection.ConnectionType;
 import com.o3dr.services.android.lib.drone.mission.Mission;
-import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.property.Type;
 import com.o3dr.services.android.lib.drone.property.VehicleMode;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import jp.realglobe.sugo.actor.Emitter;
 import jp.realglobe.sugo.actor.ModuleMethod;
@@ -80,13 +79,16 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String EVENT_MODE = "mode";
 
     /**
-     * {@value}: 駆動状態通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>arming</th><th>駆動していれば {@code true}、していなければ {@code false}</th></tr>
-     * </table>
+     * {@value}: 駆動開始通知。
+     * 添付データ無し
      */
-    public static final String EVENT_ARMING = "arming";
+    public static final String EVENT_ARMED = "armed";
+
+    /**
+     * {@value}: 駆動終了通知。
+     * 添付データ無し
+     */
+    public static final String EVENT_DISARMED = "disarmed";
 
     /**
      * {@value}: 速さ通知。
@@ -111,7 +113,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String EVENT_BATTERY = "battery";
 
     /**
-     * {@value}: 基点の通知。
+     * {@value}: 起点の通知。
      * <table border=1>
      * <caption>添付データ</caption>
      * <tr><th>coordinate</th><th>位置座標</th></tr>
@@ -120,22 +122,13 @@ public class ArduCopter extends Emitter implements Cloneable {
     public static final String EVENT_HOME = "home";
 
     /**
-     * {@value}: 高さの通知。
-     * <table border=1>
-     * <caption>添付データ</caption>
-     * <tr><th>altitude</th><th>高さ</th></tr>
-     * </table>
-     */
-    public static final String EVENT_ALTITUDE = "altitude";
-
-    /**
-     * {@value}: GPS の示す位置の通知。
+     * {@value}: 現在位置の通知。
      * <table border=1>
      * <caption>添付データ</caption>
      * <tr><th>coordinate</th><th>位置座標</th></tr>
      * </table>
      */
-    public static final String EVENT_GPS_POSITION = "gpsPosition";
+    public static final String EVENT_POSITION = "position";
 
     /**
      * {@value}: 読み込んだミッションの通知。
@@ -167,6 +160,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     private final ControlApi control;
     private final VehicleApi vehicle;
     private final MissionApi mission;
+    private final DroneWrapper info;
 
 
     public ArduCopter(String name, Handler handler, Context context) {
@@ -178,7 +172,7 @@ public class ArduCopter extends Emitter implements Cloneable {
         this.control = ControlApi.getApi(this.drone);
         this.vehicle = VehicleApi.getApi(this.drone);
         this.mission = MissionApi.getApi(this.drone);
-
+        this.info = new DroneWrapper(this.drone);
 
         this.tower.connect(new MyTowerListener(this.tower, this.drone, handler, this));
     }
@@ -348,7 +342,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     }
 
     /**
-     * 基点を設定する
+     * 起点を設定する
      *
      * @param latitude  緯度
      * @param longitude 経度
@@ -388,13 +382,8 @@ public class ArduCopter extends Emitter implements Cloneable {
      */
     @ModuleMethod
     public void saveMission(Object[] mission) {
-        final List<MissionItem> items = Missions.decode(mission);
-        Mission currentMission = new Mission();
-        currentMission.clear();
-        for (MissionItem item : items) {
-            currentMission.addMissionItem(item);
-        }
-        this.mission.setMission(currentMission, true);
+        final Mission newMission = Missions.decode(mission);
+        this.mission.setMission(newMission, true);
     }
 
     /**
@@ -416,6 +405,117 @@ public class ArduCopter extends Emitter implements Cloneable {
     @ModuleMethod
     public void pauseMission() {
         this.mission.pauseMission(null);
+    }
+
+    /**
+     * 接続しているかどうかを返す
+     *
+     * @return 接続していれば true
+     */
+    @ModuleMethod
+    public boolean isConnected() {
+        return this.info.isConnected();
+    }
+
+
+    /**
+     * 駆動しているかどうかを返す
+     *
+     * @return 駆動していれば true
+     */
+    @ModuleMethod
+    public boolean isArmed() {
+        return this.info.isArmed();
+    }
+
+    /**
+     * 飛んでいるかどうかを返す
+     *
+     * @return 飛んでいれば true
+     */
+    @ModuleMethod
+    public boolean isFlying() {
+        return this.info.isFlying();
+    }
+
+    /**
+     * 機種を返す
+     *
+     * @return 機種情報。{@link #EVENT_TYPE} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getType() {
+        return this.info.getType();
+    }
+
+    /**
+     * 動作モードを返す
+     *
+     * @return 動作モード情報。{@link #EVENT_MODE} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getMode() {
+        return this.info.getMode();
+    }
+
+    /**
+     * 速さを返す
+     *
+     * @return 速さ情報。{@link #EVENT_SPEED} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getSpeed() {
+        return this.info.getSpeed();
+    }
+
+    /**
+     * バッテリー状態を返す
+     *
+     * @return バッテリー状態情報。{@link #EVENT_BATTERY} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getBattery() {
+        return this.info.getBattery();
+    }
+
+    /**
+     * 起点を返す
+     *
+     * @return 起点情報。{@link #EVENT_HOME} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getHome() {
+        return this.info.getHome();
+    }
+
+    /**
+     * 現在位置を返す
+     *
+     * @return 現在位置情報。{@link #EVENT_POSITION} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getPosition() {
+        return this.info.getPosition();
+    }
+
+    /**
+     * 読み込んだミッションを返す
+     *
+     * @return 読み込んだミッション情報。{@link #EVENT_MISSION} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getMission() {
+        return this.info.getMission();
+    }
+
+    /**
+     * 到達したミッションコマンドを返す
+     *
+     * @return 到達したミッションコマンド情報。{@link #EVENT_COMMAND_REACHED} を参照
+     */
+    @ModuleMethod
+    public Map<String, Object> getReachedCommand() {
+        return this.info.getReachedCommand();
     }
 
 }

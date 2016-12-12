@@ -37,18 +37,29 @@ co(function * () {
     }
   })
 
-  arduCopter.on('arming', data => {
-    if (data.arming) {
-      console.log('TAKEOFF')
-      arduCopter.takeoff(takeoffAlt)
-    }
+  arduCopter.on('armed', data => {
+    arduCopter.on('disarmed', () => {
+      console.log('DISCONNECT')
+      caller.disconnect()
+    })
+
+    console.log('TAKEOFF')
+    arduCopter.takeoff(takeoffAlt)
   })
 
-  arduCopter.on('altitude', data => {
+  var goal
+  var cur
+  arduCopter.on('position', data => {
+    cur = data.coordinate
+    if (cur[0] !== 0 && typeof goal === 'undefined') {
+      console.log('START ' + cur)
+      const diff = moveDist / Math.sqrt(2)
+      goal = [cur[0] + diff, cur[1] + diff]
+    }
     switch (phase) {
       case 1: {
-        console.log('alt: ' + data.altitude)
-        if (data.altitude > takeoffAlt * 0.9) {
+        console.log('alt: ' + cur[2])
+        if (cur[2] > takeoffAlt * 0.9) {
           phase = 2
           console.log('CLIMB TO ' + maxAlt)
           arduCopter.climbTo(maxAlt)
@@ -56,8 +67,8 @@ co(function * () {
         break
       }
       case 2: {
-        console.log('alt: ' + data.altitude)
-        if (data.altitude > maxAlt * 0.9) {
+        console.log('alt: ' + cur[2])
+        if (cur[2] > maxAlt * 0.9) {
           phase = 3
           console.log('GO TO ' + goal);
 
@@ -72,19 +83,6 @@ co(function * () {
         }
         break
       }
-    }
-  })
-
-  var goal
-  var cur
-  arduCopter.on('gpsPosition', data => {
-    cur = data.coordinate
-    if (typeof goal === 'undefined') {
-      console.log('START ' + cur)
-      const diff = moveDist / Math.sqrt(2)
-      goal = [cur[0] + diff, cur[1] + diff]
-    }
-    switch (phase) {
       case 3: {
         const dist = distance(cur, goal)
         console.log('dist: ' + dist)
@@ -92,14 +90,11 @@ co(function * () {
           phase = 4
           console.log('LAND')
           arduCopter.land()
-
-          arduCopter.on('arming', data => {
-            if (!data.arming) {
-              console.log('DISCONNECT')
-              caller.disconnect()
-            }
-          })
         }
+        break
+      }
+      case 4: {
+        console.log('alt: ' + cur[2])
         break
       }
       default: {
