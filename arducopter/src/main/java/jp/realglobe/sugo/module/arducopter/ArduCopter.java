@@ -204,13 +204,13 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * 向きを変える
      *
-     * @param targetAngle 角度
-     * @param turnSpeed   向きを変える速度
-     * @param isRelative  相対的な角度かどうか
+     * @param angle        角度
+     * @param angularSpeed 向きを変える速度
+     * @param relative     相対的な角度かどうか
      */
     @ModuleMethod
-    public void turnTo(double targetAngle, double turnSpeed, boolean isRelative) {
-        this.control.turnTo((float) targetAngle, (float) turnSpeed, isRelative, null);
+    public void turnTo(double angle, double angularSpeed, boolean relative) {
+        this.control.turnTo((float) angle, (float) angularSpeed, relative, null);
     }
 
     /**
@@ -264,7 +264,7 @@ public class ArduCopter extends Emitter implements Cloneable {
     /**
      * ドローンに保存されているミッションを読み込む。
      * ミッションは EVENT_MISSION イベントで受け取る。
-     * ミッションについては {@link Missions} を参照
+     * ミッションについては {@link Command} を参照
      */
     @ModuleMethod
     public void loadMission() {
@@ -273,7 +273,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * ドローンにミッションを保存する。
-     * ミッションについては {@link Missions} を参照
+     * ミッションについては {@link Command} を参照
      *
      * @param mission ミッション
      */
@@ -285,7 +285,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * ミッションの実行を開始する。
-     * ミッションについては {@link Missions} を参照
+     * ミッションについては {@link Command} を参照
      *
      * @param forceModeChange ミッションを実行できるモードに自動で移るか
      * @param forceArm        自動で駆動を開始するか
@@ -297,7 +297,7 @@ public class ArduCopter extends Emitter implements Cloneable {
 
     /**
      * ミッションの実行を一時停止する。
-     * ミッションについては {@link Missions} を参照
+     * ミッションについては {@link Command} を参照
      */
     @ModuleMethod
     public void pauseMission() {
