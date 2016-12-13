@@ -112,7 +112,15 @@ final class DroneWrapper {
         final Gps gps = this.drone.getAttribute(AttributeType.GPS);
         final LatLong latLong = gps.getPosition();
         final Altitude altitude = this.drone.getAttribute(AttributeType.ALTITUDE);
-        final List<Object> coordinate = Arrays.asList(latLong.getLatitude(), latLong.getLongitude(), altitude.getAltitude());
+        final List<Object> coordinate;
+        if (latLong == null) {
+            coordinate = Arrays.asList(0, 0, altitude.getAltitude());
+        } else if (altitude == null) {
+            coordinate = Arrays.asList(latLong.getLatitude(), latLong.getLongitude(), 0);
+        } else {
+            // どっちも null なら呼ぶな。
+            coordinate = Arrays.asList(latLong.getLatitude(), latLong.getLongitude(), altitude.getAltitude());
+        }
         final Map<String, Object> data = new HashMap<>();
         data.put(KEY_COORDINATE, coordinate);
         return data;

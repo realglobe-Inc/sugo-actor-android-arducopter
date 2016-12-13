@@ -85,7 +85,7 @@ public enum Event {
      * 現在位置の通知。
      * <table border=1>
      * <caption>添付データ</caption>
-     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * <tr><th>coordinate</th><th>位置座標。不明な部分は 0</th></tr>
      * </table>
      */
     position,
