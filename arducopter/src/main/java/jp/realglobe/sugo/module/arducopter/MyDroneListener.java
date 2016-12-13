@@ -7,8 +7,10 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import jp.realglobe.sugo.actor.Emitter;
@@ -170,4 +172,9 @@ final class MyDroneListener implements DroneListener {
     synchronized void disableEvents(Collection<Event> events) {
         this.enableEvents.removeAll(events);
     }
+
+    synchronized List<Event> getEnableEvents() {
+        return new ArrayList<>(enableEvents);
+    }
+
 }

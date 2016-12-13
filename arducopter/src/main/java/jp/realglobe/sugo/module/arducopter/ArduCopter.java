@@ -446,4 +446,18 @@ public class ArduCopter extends Emitter implements Cloneable {
         return list;
     }
 
+    /**
+     * 有効なイベントを返す
+     *
+     * @return 有効なイベント
+     */
+    @ModuleMethod
+    public List<String> getEnableEvents() {
+        final List<String> events = new ArrayList<>();
+        for (Event event : this.listener.getEnableEvents()) {
+            events.add(event.name());
+        }
+        return events;
+    }
+
 }
