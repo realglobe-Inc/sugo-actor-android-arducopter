@@ -118,6 +118,13 @@ final class MyDroneListener implements DroneListener {
                 break;
             }
 
+            case AttributeEvent.ATTITUDE_UPDATED: {
+                final Object data = this.drone.getAttitude();
+                Log.d(LOG_TAG, "Drone attitude updated: " + data);
+                emit(Event.attitude, data);
+                break;
+            }
+
             case AttributeEvent.MISSION_RECEIVED: {
                 final Object data = this.drone.getMission();
                 Log.d(LOG_TAG, "Drone mission received: " + data);

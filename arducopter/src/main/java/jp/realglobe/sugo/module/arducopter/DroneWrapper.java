@@ -5,6 +5,7 @@ import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.mission.Mission;
 import com.o3dr.services.android.lib.drone.property.Altitude;
+import com.o3dr.services.android.lib.drone.property.Attitude;
 import com.o3dr.services.android.lib.drone.property.Battery;
 import com.o3dr.services.android.lib.drone.property.Gps;
 import com.o3dr.services.android.lib.drone.property.Home;
@@ -37,6 +38,12 @@ final class DroneWrapper {
     private static final String KEY_CURRENT = "current";
     private static final String KEY_COORDINATE = "coordinate";
     private static final String KEY_COMMANDS = "commands";
+    private static final String KEY_PITCH = "pitch";
+    private static final String KEY_PITCH_SPEED = "pitchSpeed";
+    private static final String KEY_ROLL = "roll";
+    private static final String KEY_ROLL_SPEED = "rollSpeed";
+    private static final String KEY_YAW = "yaw";
+    private static final String KEY_YAW_SPEED = "yawSpeed";
     private static final String KEY_INDEX = "index";
 
     private final Drone drone;
@@ -108,6 +115,18 @@ final class DroneWrapper {
         final List<Object> coordinate = Arrays.asList(latLong.getLatitude(), latLong.getLongitude(), altitude.getAltitude());
         final Map<String, Object> data = new HashMap<>();
         data.put(KEY_COORDINATE, coordinate);
+        return data;
+    }
+
+    Map<String, Object> getAttitude() {
+        final Attitude attitude = this.drone.getAttribute(AttributeType.ATTITUDE);
+        final Map<String, Object> data = new HashMap<>();
+        data.put(KEY_PITCH, attitude.getPitch());
+        data.put(KEY_PITCH_SPEED, attitude.getPitchSpeed());
+        data.put(KEY_ROLL, attitude.getRoll());
+        data.put(KEY_ROLL_SPEED, attitude.getRollSpeed());
+        data.put(KEY_YAW, attitude.getYaw());
+        data.put(KEY_YAW_SPEED, attitude.getYawSpeed());
         return data;
     }
 
