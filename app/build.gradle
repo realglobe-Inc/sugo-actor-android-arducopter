@@ -24,6 +24,9 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }
 
 dependencies {
@@ -33,7 +36,13 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-    compile project(':arducopter');
+    compile(group: 'jp.realglobe', name: 'sugo-actor', version: '3.0.1') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+    compile('jp.realglobe:sugo-module-android-arducopter:4.1.0@aar') {
+        transitive = true
+    }
 }
 
 repositories {

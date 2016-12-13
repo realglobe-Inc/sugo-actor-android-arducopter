@@ -1,1 +1,1 @@
-include ':app', ':arducopter'
+include ':app'

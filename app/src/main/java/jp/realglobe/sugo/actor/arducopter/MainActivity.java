@@ -19,7 +19,7 @@ import android.widget.Button;
 import java.util.Random;
 
 import jp.realglobe.sugo.actor.Actor;
-import jp.realglobe.sugo.module.arducopter.ArduCopter;
+import jp.realglobe.sugo.module.android.arducopter.ArduCopter;
 
 public class MainActivity extends AppCompatActivity {
 
