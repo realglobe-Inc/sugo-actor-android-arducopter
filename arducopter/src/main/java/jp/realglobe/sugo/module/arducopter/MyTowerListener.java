@@ -8,6 +8,7 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.interfaces.TowerListener;
 
 import java.util.Collection;
+import java.util.List;
 
 import jp.realglobe.sugo.actor.Emitter;
 
@@ -51,6 +52,10 @@ final class MyTowerListener implements TowerListener {
 
     void disableEvents(Collection<Event> events) {
         this.droneListener.disableEvents(events);
+    }
+
+    List<Event> getEnableEvents() {
+        return this.droneListener.getEnableEvents();
     }
 
 }

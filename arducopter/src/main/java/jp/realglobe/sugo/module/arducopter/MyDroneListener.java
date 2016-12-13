@@ -7,8 +7,10 @@ import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.interfaces.DroneListener;
 import com.o3dr.services.android.lib.drone.attribute.AttributeEvent;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import jp.realglobe.sugo.actor.Emitter;
@@ -118,6 +120,13 @@ final class MyDroneListener implements DroneListener {
                 break;
             }
 
+            case AttributeEvent.ATTITUDE_UPDATED: {
+                final Object data = this.drone.getAttitude();
+                Log.d(LOG_TAG, "Drone attitude updated: " + data);
+                emit(Event.attitude, data);
+                break;
+            }
+
             case AttributeEvent.MISSION_RECEIVED: {
                 final Object data = this.drone.getMission();
                 Log.d(LOG_TAG, "Drone mission received: " + data);
@@ -163,4 +172,9 @@ final class MyDroneListener implements DroneListener {
     synchronized void disableEvents(Collection<Event> events) {
         this.enableEvents.removeAll(events);
     }
+
+    synchronized List<Event> getEnableEvents() {
+        return new ArrayList<>(enableEvents);
+    }
+
 }

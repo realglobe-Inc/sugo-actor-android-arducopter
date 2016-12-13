@@ -85,10 +85,24 @@ public enum Event {
      * 現在位置の通知。
      * <table border=1>
      * <caption>添付データ</caption>
-     * <tr><th>coordinate</th><th>位置座標</th></tr>
+     * <tr><th>coordinate</th><th>位置座標。不明な部分は 0</th></tr>
      * </table>
      */
     position,
+
+    /**
+     * 向きの通知。
+     * <table border=1>
+     * <caption>添付データ</caption>
+     * <tr><th>pitch</th><th>上下を向く角度</th></tr>
+     * <tr><th>pitchSpeed</th><th>上下を向く速さ</th></tr>
+     * <tr><th>roll</th><th>頭を横に傾ける角度</th></tr>
+     * <tr><th>rollSpeed</th><th>頭を横に傾ける速さ</th></tr>
+     * <tr><th>yaw</th><th>左右を向く角度</th></tr>
+     * <tr><th>yawSpeed</th><th>左右を向く速さ</th></tr>
+     * </table>
+     */
+    attitude,
 
     /**
      * 読み込んだミッションの通知。
