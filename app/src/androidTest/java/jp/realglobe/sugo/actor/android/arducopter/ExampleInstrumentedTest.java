@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.actor.android.arducopter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

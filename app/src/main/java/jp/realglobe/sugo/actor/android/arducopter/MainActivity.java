@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.actor.android.arducopter;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         if (this.actor != null) {
             this.actor.disconnect();
             this.actor = null;
-            this.changeToUnconnectState();
+            this.changeToDisconnectState();
         }
     }
 
@@ -97,9 +97,7 @@ public class MainActivity extends AppCompatActivity {
             final MainActivity activity = (MainActivity) getActivity();
             return (new AlertDialog.Builder(activity))
                     .setTitle("切断しますか？")
-                    .setPositiveButton("切断する", (dialog, which) -> {
-                        activity.disconnect();
-                    })
+                    .setPositiveButton("切断する", (dialog, which) -> activity.disconnect())
                     .create();
         }
     }
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         this.startButton.setText(getString(R.string.button_start_connected));
     }
 
-    private void changeToUnconnectState() {
+    private void changeToDisconnectState() {
         this.startButton.setEnabled(true);
         this.startButton.setText(getString(R.string.button_start));
     }

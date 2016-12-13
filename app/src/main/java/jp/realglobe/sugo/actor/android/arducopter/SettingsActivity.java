@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.actor.arducopter;
+package jp.realglobe.sugo.actor.android.arducopter;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
