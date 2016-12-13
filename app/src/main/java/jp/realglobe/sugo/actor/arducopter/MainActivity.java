@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.module.close();
         disconnect();
+        this.module.close();
     }
 
     private void disconnect() {
