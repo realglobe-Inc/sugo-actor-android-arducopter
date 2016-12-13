@@ -1,4 +1,4 @@
-package jp.realglobe.sugo.module.arducopter;
+package jp.realglobe.sugo.actor.android.arducopter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("jp.realglobe.sugo.module.arducopter.test", appContext.getPackageName());
+        assertEquals("jp.realglobe.sugo.actor.arducopter", appContext.getPackageName());
     }
 }

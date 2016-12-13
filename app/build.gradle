@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
-        applicationId "jp.realglobe.sugo.actor.arducopter"
+        applicationId 'jp.realglobe.sugo.actor.android.arducopter'
         minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
@@ -24,16 +24,25 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-    compile project(':arducopter');
+    compile('jp.realglobe:sugo-actor:3.0.1') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+    compile('jp.realglobe:sugo-module-android-arducopter:4.1.0@aar') {
+        transitive = true
+    }
 }
 
 repositories {
