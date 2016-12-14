@@ -13,4 +13,5 @@
     <string name="actor_description">arduCopter actor in Android</string>
     <string name="module_description">arduCopter module in Android</string>
     <string name="item_disconnect">切断</string>
+    <string name="item_allow">許可</string>
 </resources>
