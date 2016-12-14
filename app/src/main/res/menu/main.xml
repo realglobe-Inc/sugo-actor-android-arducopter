@@ -7,6 +7,11 @@
         android:title="@string/item_settings" />
 
     <item
+        android:id="@+id/item_allow"
+        android:orderInCategory="150"
+        android:title="@string/item_allow" />
+
+    <item
         android:id="@+id/item_disconnect"
         android:orderInCategory="200"
         android:title="@string/item_disconnect" />
