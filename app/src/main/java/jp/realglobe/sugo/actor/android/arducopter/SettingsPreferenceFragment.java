@@ -31,7 +31,7 @@ public class SettingsPreferenceFragment extends PreferenceFragment {
 
         addPreferencesFromResource(R.xml.settings);
         showDefaults();
-        changeListener = (sharedPreferences, key) -> {
+        changeListener = (SharedPreferences sharedPreferences, String key) -> {
             if (showDefaultKeys.contains(key)) {
                 showDefault(key);
             }

@@ -1,10 +1,17 @@
 package jp.realglobe.sugo.actor.android.arducopter;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import jp.realglobe.sugo.actor.Actor;
@@ -14,7 +21,7 @@ import jp.realglobe.sugo.module.android.arducopter.ArduCopter;
  * Actor を担うサービス。
  * Created by fukuchidaisuke on 16/12/14.
  */
-public class ActorService extends IntentService {
+public class ActorService extends Service {
 
     private static final String LOG_TAG = ActorService.class.getName();
 
@@ -26,13 +33,39 @@ public class ActorService extends IntentService {
     private Actor actor;
     private ArduCopter module;
 
-    public ActorService() {
-        super(ActorService.class.getSimpleName());
+    private MyHandler myHandler;
+
+    private final class MyHandler extends Handler {
+        public MyHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            final Bundle data = msg.getData();
+            startActor(data.getString(KEY_ACTOR_KEY), data.getString(KEY_HUB_ADDRESS));
+        }
+    }
+
+
+    public void onCreate() {
+        final HandlerThread thread = new HandlerThread(getClass().getName(), Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+
+        final Looper looper = thread.getLooper();
+        this.myHandler = new MyHandler(looper);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        startActor(intent.getStringExtra(KEY_ACTOR_KEY), intent.getStringExtra(KEY_HUB_ADDRESS));
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        final Message msg = this.myHandler.obtainMessage();
+        msg.arg1 = startId;
+        final Bundle data = new Bundle();
+        data.putString(KEY_ACTOR_KEY, intent.getStringExtra(KEY_ACTOR_KEY));
+        data.putString(KEY_HUB_ADDRESS, intent.getStringExtra(KEY_HUB_ADDRESS));
+        msg.setData(data);
+        myHandler.sendMessage(msg);
+        return START_STICKY;
     }
 
     @Override
@@ -40,6 +73,12 @@ public class ActorService extends IntentService {
         super.onDestroy();
         disconnect();
         this.module.close();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void disconnect() {
@@ -67,7 +106,10 @@ public class ActorService extends IntentService {
         final String moduleDescription = getString(R.string.module_description);
         this.actor.addModule(moduleName, moduleVersion, moduleDescription, this.module);
 
-        this.actor.setOnConnect(() -> Log.i(LOG_TAG, "connected"));
+        this.actor.setOnConnect(() -> {
+            Log.i(LOG_TAG, "connected");
+            return;
+        });
 
         this.actor.connect(hubAddress);
 
@@ -80,12 +122,6 @@ public class ActorService extends IntentService {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
         startForeground(NOTIFICATION_ID, notification);
-
-        try {
-            Thread.sleep(Long.MAX_VALUE);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
 }
