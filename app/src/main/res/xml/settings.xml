@@ -13,7 +13,7 @@
         android:defaultValue="@string/default_actor_id"
         android:dialogMessage="ID を入力してください\nsugo-actor としてのキーは先頭にアプリケーション固有のタグを付けたものになります"
         android:dialogTitle="クライアント ID"
-        android:key="@string/key_actor_id"
+        android:key="@string/key_actor_key"
         android:summary=""
         android:title="クライアント ID" />
 

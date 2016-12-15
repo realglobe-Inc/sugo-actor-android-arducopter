@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def moduleVersion = '4.1.0'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
@@ -18,6 +20,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        buildTypes.each {
+            it.resValue('string', 'module_version', moduleVersion)
         }
     }
     compileOptions {
@@ -40,7 +45,7 @@ dependencies {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
-    compile('jp.realglobe:sugo-module-android-arducopter:4.1.0@aar') {
+    compile("jp.realglobe:sugo-module-android-arducopter:${moduleVersion}@aar") {
         transitive = true
     }
 }

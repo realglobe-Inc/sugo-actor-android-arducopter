@@ -23,6 +23,8 @@
         </activity>
 
         <activity android:name=".SettingsActivity" />
+
+        <service android:name=".ActorService" />
     </application>
 
 </manifest>

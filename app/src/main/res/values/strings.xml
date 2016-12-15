@@ -1,17 +1,16 @@
 <resources>
     <string name="app_name">SugoActorArducopter</string>
-    <string name="button_start">接続する</string>
-    <string name="button_start_connecting">接続中</string>
-    <string name="button_start_connected">接続済み</string>
+    <string name="button_start">起動</string>
+    <string name="button_started">起動済み</string>
     <string name="key_hub">hub</string>
     <string name="default_hub">http://localhost:8080/</string>
-    <string name="key_actor_id">actor-id</string>
+    <string name="key_actor_key">actorKey</string>
     <string name="default_actor_id">1</string>
     <string name="item_settings">設定</string>
     <string name="module_name">arduCopter</string>
     <string name="actor_key_prefix">arducopter:</string>
     <string name="actor_description">arduCopter actor in Android</string>
     <string name="module_description">arduCopter module in Android</string>
-    <string name="item_disconnect">切断</string>
+    <string name="item_stop">停止</string>
     <string name="item_allow">許可</string>
 </resources>
