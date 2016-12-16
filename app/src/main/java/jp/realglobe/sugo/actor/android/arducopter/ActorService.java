@@ -107,8 +107,8 @@ public class ActorService extends Service {
         this.actor.addModule(moduleName, moduleVersion, moduleDescription, this.module);
 
         this.actor.setOnConnect(() -> {
+            // Log.i は int を返すので Runnable にするために括る
             Log.i(LOG_TAG, "connected");
-            return;
         });
 
         this.actor.connect(hubAddress);
