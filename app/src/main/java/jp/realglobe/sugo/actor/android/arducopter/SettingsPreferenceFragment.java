@@ -26,12 +26,12 @@ public class SettingsPreferenceFragment extends PreferenceFragment {
 
         showDefaultKeys.addAll(Arrays.asList(
                 getString(R.string.key_hub),
-                getString(R.string.key_actor_id)
+                getString(R.string.key_actor_key)
         ));
 
         addPreferencesFromResource(R.xml.settings);
         showDefaults();
-        changeListener = (sharedPreferences, key) -> {
+        changeListener = (SharedPreferences sharedPreferences, String key) -> {
             if (showDefaultKeys.contains(key)) {
                 showDefault(key);
             }

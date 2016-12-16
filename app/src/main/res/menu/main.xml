@@ -12,8 +12,8 @@
         android:title="@string/item_allow" />
 
     <item
-        android:id="@+id/item_disconnect"
+        android:id="@+id/item_stop"
         android:orderInCategory="200"
-        android:title="@string/item_disconnect" />
+        android:title="@string/item_stop" />
 
 </menu>
