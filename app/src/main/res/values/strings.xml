@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SugoActorArducopter</string>
+    <string name="app_name">SugoActorArduCopter</string>
     <string name="button_start">起動</string>
     <string name="button_started">起動済み</string>
     <string name="key_hub">hub</string>
@@ -7,10 +7,11 @@
     <string name="key_actor_key">actorKey</string>
     <string name="default_actor_id">1</string>
     <string name="item_settings">設定</string>
-    <string name="module_name">arduCopter</string>
+    <string name="module_name">ArduCopter</string>
     <string name="actor_key_prefix">arducopter:</string>
-    <string name="actor_description">arduCopter actor in Android</string>
-    <string name="module_description">arduCopter module in Android</string>
+    <string name="actor_description">ArduCopter actor in Android</string>
+    <string name="module_description">ArduCopter module in Android</string>
     <string name="item_stop">停止</string>
     <string name="item_allow">許可</string>
+    <string name="service_name">SugoActorArduCopter</string>
 </resources>

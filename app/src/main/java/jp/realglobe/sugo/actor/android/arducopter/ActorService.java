@@ -116,8 +116,8 @@ public class ActorService extends Service {
         final Intent notificationIntent = new Intent(this, MainActivity.class);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         final Notification notification = new Notification.Builder(this)
-                .setContentTitle("AHO")
-                .setContentText("BAKA")
+                .setContentTitle(getString(R.string.service_name))
+                .setContentText(actorKey + "@" + hubAddress)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
