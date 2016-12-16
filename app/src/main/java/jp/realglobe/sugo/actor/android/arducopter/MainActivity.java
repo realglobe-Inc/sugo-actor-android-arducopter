@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         this.startButton = (Button) findViewById(R.id.button_start);
 
         checkPermission();
+        checkActorRunning();
     }
 
     /**
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void disconnectAfterDialog() {
-        if (isActorRunning()) {
+        if (checkActorRunning()) {
             (new DisconnectDialog()).show(getFragmentManager(), "dialog");
         }
     }
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                     .setTitle("停止しますか？")
                     .setPositiveButton("停止する", (dialog, which) -> {
                         activity.stopActor();
-                        activity.changeToStoppingState();
+                        activity.changeToNotRunningState();
                     })
                     .create();
         }
@@ -146,11 +147,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStartButtonTapped(View view) {
         startActor();
-        this.startButton.post(this::changeToStartedState);
+        this.startButton.post(this::changeToRunningState);
     }
 
     private void startActor() {
-        if (isActorRunning()) {
+        if (checkActorRunning()) {
             Log.i(LOG_TAG, "Already actor started");
             return;
         }
@@ -166,10 +167,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopActor() {
-        if (!isActorRunning()) {
+        if (!checkActorRunning()) {
             Log.i(LOG_TAG, "Actor is not running");
         }
         stopService(new Intent(this, ActorService.class));
+    }
+
+    /**
+     * Actor が動いているかどうか調べて、表示を合わせる
+     *
+     * @return Actor が動いていたら true
+     */
+    private boolean checkActorRunning() {
+        if (isActorRunning()) {
+            changeToRunningState();
+            return true;
+        } else {
+            changeToNotRunningState();
+            return false;
+        }
     }
 
     private boolean isActorRunning() {
@@ -182,12 +198,12 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void changeToStartedState() {
+    private void changeToRunningState() {
         this.startButton.setEnabled(false);
         this.startButton.setText(getString(R.string.button_started));
     }
 
-    private void changeToStoppingState() {
+    private void changeToNotRunningState() {
         this.startButton.setEnabled(true);
         this.startButton.setText(getString(R.string.button_start));
     }
