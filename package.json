@@ -2,6 +2,6 @@
   "devDependencies": {
     "co": "^4.6.0",
     "sugo-caller": "^3.0.5",
-    "sugo-hub": "^4.0.14"
+    "sugo-hub": "^5.1.0"
   }
 }

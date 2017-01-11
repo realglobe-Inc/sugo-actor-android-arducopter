@@ -12,7 +12,7 @@ const DRONE_ADDR = process.env.DRONE_ADDR || 'localhost'
 co(function * () {
   const caller = sugoCaller(HUB + '/callers')
   const actor = yield caller.connect(ACTOR)
-  const arduCopter = actor.get('arduCopter')
+  const arduCopter = actor.get('ArduCopter')
 
   const takeoffAlt = 10
   const maxAlt = 50
