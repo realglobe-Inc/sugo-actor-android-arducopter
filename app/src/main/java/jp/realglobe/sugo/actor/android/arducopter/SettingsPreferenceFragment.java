@@ -70,4 +70,5 @@ public class SettingsPreferenceFragment extends PreferenceFragment {
             showDefault(key);
         }
     }
+
 }
