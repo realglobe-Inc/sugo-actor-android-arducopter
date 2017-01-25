@@ -18,16 +18,16 @@ co(function * () {
   const maxAlt = 50
   const moveDist = 0.001
 
-  var gps
+  let gps
   arduCopter.on('position', data => { gps = data.coordinate })
 
-  var mission
-  arduCopter.on('mode', data => {
-    if (data.mode.toUpperCase() === 'GUIDED' && typeof mission === 'undefined') {
+  let mission
+  let afterGuided = () => {
+    if (typeof mission === 'undefined') {
       console.log('SET MISSION')
 
       const goal = [gps[0] + moveDist, gps[1], 0]
-      const mission = [{
+      mission = [{
         type: 'takeoff',
         altitude: takeoffAlt
       }, { // 上昇
@@ -45,6 +45,12 @@ co(function * () {
         type: 'land'
       }]
       arduCopter.saveMission(mission)
+    }
+  }
+
+  arduCopter.on('mode', data => {
+    if (data.mode.toUpperCase() === 'GUIDED') {
+      afterGuided()
     }
   })
 
@@ -71,5 +77,9 @@ co(function * () {
     'mode',
     'position'
   ])
-  yield arduCopter.setMode('GUIDED')
+  if ((yield arduCopter.getMode()).mode.toUpperCase() === 'GUIDED') {
+    yield arduCopter.setMode('GUIDED')
+  } else {
+    afterGuided()
+  }
 }).catch((err) => console.error(err))

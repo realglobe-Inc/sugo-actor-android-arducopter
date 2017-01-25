@@ -29,15 +29,7 @@ co(function * () {
   // 3: 移動
   // 4: 着陸
   let phase
-  arduCopter.on('mode', data => {
-    if (data.mode.toUpperCase() === 'GUIDED' && typeof phase === 'undefined') {
-      phase = 1
-      console.log('ARM')
-      arduCopter.arm(true)
-    }
-  })
-
-  arduCopter.on('armed', data => {
+  let afterArmed = () => {
     arduCopter.on('disarmed', () => {
       console.log('DISCONNECT')
       caller.disconnect()
@@ -45,10 +37,29 @@ co(function * () {
 
     console.log('TAKEOFF')
     arduCopter.takeoff(takeoffAlt)
+  }
+  let afterGuided = () => co(function *() {
+    if (typeof phase === 'undefined') {
+      phase = 1
+      console.log('ARM')
+      const armed = yield arduCopter.isArmed()
+      if (armed) {
+        afterArmed()
+      } else {
+        arduCopter.arm(true)
+      }
+    }
+  })
+  arduCopter.on('mode', data => {
+    if (data.mode.toUpperCase() === 'GUIDED') {
+      afterGuided()
+    }
   })
 
-  var goal
-  var cur
+  arduCopter.on('armed', data => afterArmed())
+
+  let goal
+  let cur
   arduCopter.on('position', data => {
     cur = data.coordinate
     if (cur[0] !== 0 && typeof goal === 'undefined') {
@@ -111,5 +122,9 @@ co(function * () {
     'mode',
     'position'
   ])
-  yield arduCopter.setMode('GUIDED')
+  if ((yield arduCopter.getMode()).mode.toUpperCase() === 'GUIDED') {
+    yield arduCopter.setMode('GUIDED')
+  } else {
+    afterGuided()
+  }
 }).catch((err) => console.error(err))
