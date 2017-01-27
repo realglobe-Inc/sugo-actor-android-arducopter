@@ -9,66 +9,37 @@ const ACTOR = process.env.ACTOR || 'arducopter:1'
 const DRONE_TYPE = process.env.DRONE_TYPE || 'udp'
 const DRONE_ADDR = process.env.DRONE_ADDR || 'localhost'
 
+const takeoffAlt = 10
+const alt = 30
+const dist = 0.0003
+const radius = 10
+const turns = 2
+
 co(function * () {
   const caller = sugoCaller(HUB + '/callers')
   const actor = yield caller.connect(ACTOR)
   const arduCopter = actor.get('ArduCopter')
 
-  const takeoffAlt = 10
-  const maxAlt = 50
-  const moveDist = 0.001
+  arduCopter.on('mode', data => console.log(JSON.stringify(data)))
+  arduCopter.on('missionSaved', () => console.log('MISSION SAVED'))
+  arduCopter.on('commandReached', data => console.log(JSON.stringify(data)))
 
-  let gps
-  arduCopter.on('position', data => { gps = data.coordinate })
-
-  let mission
-  let afterGuided = () => {
-    if (typeof mission === 'undefined') {
-      console.log('SET MISSION')
-
-      const goal = [gps[0] + moveDist, gps[1], 0]
-      mission = [{
-        type: 'takeoff',
-        altitude: takeoffAlt
-      }, { // 上昇
-        type: 'waypoint',
-        coordinate: [0, 0, maxAlt]
-      }, {
-        type: 'waypoint',
-        coordinate: goal
-      }, {
-        type: 'circle',
-        coordinate: [0, 0, 0],
-        radius: 25,
-        turns: 2
-      }, {
-        type: 'land'
-      }]
-      arduCopter.saveMission(mission)
-    }
-  }
-
-  arduCopter.on('mode', data => {
-    if (data.mode.toUpperCase() === 'GUIDED') {
-      afterGuided()
-    }
+  let coordinate
+  arduCopter.on('position', data => {
+    console.log(JSON.stringify(data))
+    coordinate = data.coordinate
   })
 
-  arduCopter.on('missionSaved', () => {
-    console.log('START MISSION')
+  arduCopter.on('disarmed', () => co(function *() {
+    console.log('DISARMED')
+    yield arduCopter.disconnect()
+    yield asleep(1000)
+    yield caller.disconnect()
+  }).catch((err) => {
+    console.error(err)
+    caller.disconnect()
+  }))
 
-    arduCopter.startMission(true, true)
-
-    arduCopter.on('disarmed', () => {
-      console.log('DISCONNECT')
-      caller.disconnect()
-    })
-  })
-
-  arduCopter.on('commandReached', data => console.log('DO COMMAND ' + data.index))
-
-  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
-  yield asleep(5000)
   yield arduCopter.disableEvents(null)
   yield arduCopter.enableEvents([
     'commandReached',
@@ -77,9 +48,35 @@ co(function * () {
     'mode',
     'position'
   ])
-  if ((yield arduCopter.getMode()).mode.toUpperCase() === 'GUIDED') {
-    yield arduCopter.setMode('GUIDED')
-  } else {
-    afterGuided()
+
+  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
+  yield asleep(3000)
+  yield arduCopter.setMode('Guided')
+  while (true) {
+    yield asleep(1000)
+    if (typeof coordinate !== 'undefined') {
+      break
+    }
   }
+
+  console.log('SAVE MISSION')
+  yield arduCopter.saveMission([{
+    type: 'takeoff',
+    altitude: takeoffAlt
+  }, { // 上昇
+    type: 'waypoint',
+    coordinate: [0, 0, alt]
+  }, {
+    type: 'waypoint',
+    coordinate: [coordinate[0] + dist, coordinate[1], 0]
+  }, {
+    type: 'circle',
+    radius,
+    turns
+  }, {
+    type: 'land'
+  }])
+  yield asleep(1000)
+  console.log('START MISSION')
+  yield arduCopter.startMission(true, true)
 }).catch((err) => console.error(err))

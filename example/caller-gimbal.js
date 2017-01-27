@@ -1,3 +1,5 @@
+// ジンバルを下に向けてから戻すだけ
+
 'use strict'
 
 const sugoCaller = require('sugo-caller')
@@ -17,22 +19,27 @@ co(function * () {
   arduCopter.on('gimbalOrientation', data => console.log(JSON.stringify(data)))
   arduCopter.on('mode', data => console.log(JSON.stringify(data)))
 
-  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
-  yield asleep(3000)
   yield arduCopter.disableEvents(null)
   yield arduCopter.enableEvents([
     'gimbalOrientation',
     'mode'
   ])
+
+  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
+  yield asleep(3000)
   yield arduCopter.setMode('Guided')
   yield asleep(1000)
+
   yield arduCopter.startGimbalControl()
   yield asleep(1000)
   yield arduCopter.setGimbalOrientation(-90, 0, 0)
-  yield asleep(3000)
+  yield asleep(5000)
   yield arduCopter.setGimbalOrientation(0, 0, 0)
-  yield asleep(3000)
+  yield asleep(5000)
   yield arduCopter.stopGimbalControl()
+
+  yield asleep(1000)
+  yield arduCopter.disconnect()
   yield asleep(1000)
   yield caller.disconnect()
 }).catch((err) => console.error(err))
