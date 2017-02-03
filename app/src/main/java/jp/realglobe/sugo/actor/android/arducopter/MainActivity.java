@@ -172,15 +172,16 @@ public class MainActivity extends AppCompatActivity {
             if (ACTION_USB_PERMISSION.equals(action)) {
                 synchronized (this) {
                     final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if (device != null) {
+                    if (device != null) {
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                             Toast.makeText(MainActivity.this, device.getDeviceName() + " を使えます", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, device.getDeviceName() + " は使えません", Toast.LENGTH_LONG).show();
                         }
+                        startActor();
                     } else {
-                        Toast.makeText(MainActivity.this, device.getDeviceName() + " は使えません", Toast.LENGTH_LONG).show();
+                        // USB Accessory 関連だった。
                     }
-                    startActor();
                 }
             }
         }
