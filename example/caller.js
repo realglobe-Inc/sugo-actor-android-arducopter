@@ -9,6 +9,10 @@ const ACTOR = process.env.ACTOR || 'arducopter:1'
 const DRONE_TYPE = process.env.DRONE_TYPE || 'udp'
 const DRONE_ADDR = process.env.DRONE_ADDR || 'localhost'
 
+const takeoffAlt = 10
+const alt = 30
+const dist = 0.0003
+
 function distance (p1, p2) {
   const x = p2[0] - p1[0]
   const y = p2[1] - p1[1]
@@ -20,101 +24,69 @@ co(function * () {
   const actor = yield caller.connect(ACTOR)
   const arduCopter = actor.get('ArduCopter')
 
-  const takeoffAlt = 10
-  const maxAlt = 50
-  const moveDist = 0.001
+  arduCopter.on('armed', () => console.log('ARMED'))
+  arduCopter.on('mode', data => console.log(JSON.stringify(data)))
 
-  // 1: 離陸
-  // 2: 上昇
-  // 3: 移動
-  // 4: 着陸
-  let phase
-  let afterArmed = () => {
-    arduCopter.on('disarmed', () => {
-      console.log('DISCONNECT')
-      caller.disconnect()
-    })
+  arduCopter.on('disarmed', () => co(function *() {
+    console.log('DISARMED')
+    yield arduCopter.disconnect()
+    yield asleep(1000)
+    yield caller.disconnect()
+  }).catch((err) => {
+    console.error(err)
+    caller.disconnect()
+  }))
 
-    console.log('TAKEOFF')
-    arduCopter.takeoff(takeoffAlt)
-  }
-  let afterGuided = () => co(function *() {
-    if (typeof phase === 'undefined') {
-      phase = 1
-      console.log('ARM')
-      const armed = yield arduCopter.isArmed()
-      if (armed) {
-        afterArmed()
-      } else {
-        arduCopter.arm(true)
-      }
-    }
-  })
-  arduCopter.on('mode', data => {
-    if (data.mode.toUpperCase() === 'GUIDED') {
-      afterGuided()
-    }
-  })
-
-  arduCopter.on('armed', data => afterArmed())
-
+  let landing = true
+  let climbing = false
+  let moving = false
+  let coordinate
   let goal
-  let cur
   arduCopter.on('position', data => {
-    cur = data.coordinate
-    if (cur[0] !== 0 && typeof goal === 'undefined') {
-      console.log('START ' + cur)
-      const diff = moveDist / Math.sqrt(2)
-      goal = [cur[0] + diff, cur[1] + diff]
-    }
-    switch (phase) {
-      case 1: {
-        console.log('alt: ' + cur[2])
-        if (cur[2] > takeoffAlt * 0.9) {
-          phase = 2
-          console.log('CLIMB TO ' + maxAlt)
-          arduCopter.climbTo(maxAlt)
-        }
-        break
-      }
-      case 2: {
-        console.log('alt: ' + cur[2])
-        if (cur[2] > maxAlt * 0.9) {
-          phase = 3
-          console.log('GO TO ' + goal);
+    console.log(JSON.stringify(data))
+    coordinate = data.coordinate
 
-          // なぜか途中で止まるので繰り返す
-          (function loop () {
-            if (phase !== 3) {
-              return
-            }
-            arduCopter.goTo(goal[0], goal[1])
-            setTimeout(loop, 10000)
-          })()
-        }
-        break
+    if (landing) {
+      if (Math.abs(takeoffAlt - coordinate[2]) < 1) {
+        landing = false
+        climbing = true
+
+        console.log('CLIMB TO ' + alt);
+        // なぜか途中で止まるので繰り返す
+        (function loop () {
+          if (!climbing) {
+            return
+          }
+          arduCopter.climbTo(alt)
+          setTimeout(loop, 10000)
+        })()
       }
-      case 3: {
-        const dist = distance(cur, goal)
-        console.log('dist: ' + dist)
-        if (dist < moveDist / 10) {
-          phase = 4
-          console.log('LAND')
-          arduCopter.land()
-        }
-        break
+    } else if (climbing) {
+      if (Math.abs(alt - coordinate[2]) < 1) {
+        climbing = false
+        moving = true
+        goal = [coordinate[0] + dist, coordinate[1]]
+
+        console.log('GO TO ' + goal);
+        // なぜか途中で止まるので繰り返す
+        (function loop () {
+          if (!moving) {
+            return
+          }
+          arduCopter.goTo(goal[0], goal[1])
+          setTimeout(loop, 10000)
+        })()
       }
-      case 4: {
-        console.log('alt: ' + cur[2])
-        break
-      }
-      default: {
+    } else if (moving) {
+      if (distance(coordinate, goal) < dist / 10) {
+        moving = false
+
+        console.log('LAND')
+        arduCopter.land()
       }
     }
   })
 
-  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
-  yield asleep(5000)
   yield arduCopter.disableEvents(null)
   yield arduCopter.enableEvents([
     'armed',
@@ -122,9 +94,14 @@ co(function * () {
     'mode',
     'position'
   ])
-  if ((yield arduCopter.getMode()).mode.toUpperCase() === 'GUIDED') {
-    yield arduCopter.setMode('GUIDED')
-  } else {
-    afterGuided()
-  }
+
+  yield arduCopter.connect(DRONE_TYPE, DRONE_ADDR)
+  yield asleep(3000)
+  yield arduCopter.setMode('Guided')
+  yield asleep(1000)
+  yield arduCopter.arm(true)
+  yield asleep(1000)
+
+  console.log('TAKEOFF')
+  yield arduCopter.takeoff(takeoffAlt)
 }).catch((err) => console.error(err))

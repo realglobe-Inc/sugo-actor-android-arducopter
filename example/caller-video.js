@@ -1,4 +1,4 @@
-// ジンバルを下に向けてから戻すだけ
+// 映像を記録してみる
 
 'use strict'
 
@@ -16,12 +16,10 @@ co(function * () {
   const actor = yield caller.connect(ACTOR)
   const arduCopter = actor.get('ArduCopter')
 
-  arduCopter.on('gimbalOrientation', data => console.log(JSON.stringify(data)))
   arduCopter.on('mode', data => console.log(JSON.stringify(data)))
 
   yield arduCopter.disableEvents(null)
   yield arduCopter.enableEvents([
-    'gimbalOrientation',
     'mode'
   ])
 
@@ -30,13 +28,9 @@ co(function * () {
   yield arduCopter.setMode('Guided')
   yield asleep(1000)
 
-  yield arduCopter.startGimbalControl()
-  yield asleep(1000)
-  yield arduCopter.setGimbalOrientation(-90, 0, 0)
-  yield asleep(5000)
-  yield arduCopter.setGimbalOrientation(0, 0, 0)
-  yield asleep(5000)
-  yield arduCopter.stopGimbalControl()
+  yield arduCopter.startVideoRecording()
+  yield asleep(30000)
+  yield arduCopter.stopVideoRecording()
 
   yield asleep(1000)
   yield arduCopter.disconnect()
