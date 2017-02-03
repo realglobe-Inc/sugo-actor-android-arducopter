@@ -5,10 +5,15 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,8 +26,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -146,8 +154,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartButtonTapped(View view) {
-        startActor();
+        final Map<String, UsbDevice> devices = ((UsbManager) getSystemService(Context.USB_SERVICE)).getDeviceList();
+        if (devices.isEmpty()) {
+            startActor();
+        } else {
+            checkUsbPermission(devices.values());
+        }
+
         this.startButton.post(this::changeToRunningState);
+    }
+
+
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device != null) {
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            Toast.makeText(MainActivity.this, device.getDeviceName() + " を使えます", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, device.getDeviceName() + " は使えません", Toast.LENGTH_LONG).show();
+                        }
+                        startActor();
+                    } else {
+                        // USB Accessory 関連だった。
+                    }
+                }
+            }
+        }
+    };
+
+    private void checkUsbPermission(Collection<UsbDevice> devices) {
+        final UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        final PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        registerReceiver(usbReceiver, filter);
+        usbManager.requestPermission((new ArrayList<>(devices)).get(0), permissionIntent);
     }
 
     private void startActor() {
@@ -155,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Already actor started");
             return;
         }
+
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         final String actorKey = getString(R.string.actor_key_prefix) + preferences.getString(getString(R.string.key_actor_key), getString(R.string.default_actor_id));
