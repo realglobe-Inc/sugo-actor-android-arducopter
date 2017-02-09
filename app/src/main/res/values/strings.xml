@@ -3,7 +3,7 @@
     <string name="button_start">起動</string>
     <string name="button_started">起動済み</string>
     <string name="key_hub">hub</string>
-    <string name="default_hub">http://localhost:8080/</string>
+    <string name="default_hub">https://edac.online/arducopter/sugos/arducopter/</string>
     <string name="key_actor_key">actorKey</string>
     <string name="default_actor_id">1</string>
     <string name="item_settings">設定</string>

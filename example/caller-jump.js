@@ -59,6 +59,6 @@ co(function * () {
   yield asleep(1000)
   yield arduCopter.setMode('Guided')
   yield asleep(1000)
-  console.log('START MISSION')
-  yield arduCopter.startMission(true, true)
+  console.log('START MISSION after 30 seconds')
+  yield arduCopter.armAndSetAutoWithDelay(30)
 }).catch((err) => console.error(err))
