@@ -1,5 +1,0 @@
-org.gradle.jvmargs=-Xmx1536m
-
-artifactory_user=${CI_READ_USERNAME}
-artifactory_password=${CI_READ_ENCODED_PASSWORD}
-artifactory_contextUrl=${CI_REPOSITORY}
